@@ -13,7 +13,7 @@ export function registerFindCommands(program: Command): void {
         await executeFind(keyword, opts);
       } catch (error) {
         if (error instanceof PrequitoError) {
-          console.error(`Error: ${error.message}`);
+          console.error(`✖ ${error.message}`);
           process.exit(1);
         }
         throw error;
@@ -30,7 +30,7 @@ export function registerFindCommands(program: Command): void {
         await executeTag(tag, opts);
       } catch (error) {
         if (error instanceof PrequitoError) {
-          console.error(`Error: ${error.message}`);
+          console.error(`✖ ${error.message}`);
           process.exit(1);
         }
         throw error;
@@ -43,7 +43,7 @@ async function executeFind(
   opts: Record<string, unknown>
 ): Promise<void> {
   if (!(await gitOps.isGitRepo())) {
-    console.error("Error: Not inside a git repository.");
+    console.error("✖ Not inside a git repository.");
     process.exit(1);
   }
 
@@ -52,7 +52,7 @@ async function executeFind(
   if (output) {
     console.log(output.trimEnd());
   } else {
-    console.log(`No commits found matching "${keyword}".`);
+    console.log(`✨ No commits found matching "${keyword}".`);
   }
 }
 
@@ -61,7 +61,7 @@ async function executeTag(
   opts: Record<string, unknown>
 ): Promise<void> {
   if (!(await gitOps.isGitRepo())) {
-    console.error("Error: Not inside a git repository.");
+    console.error("✖ Not inside a git repository.");
     process.exit(1);
   }
 
@@ -71,7 +71,7 @@ async function executeTag(
     if (output) {
       console.log(output.trimEnd());
     } else {
-      console.log("No commits found.");
+      console.log("✨ No commits found.");
     }
   } else {
     console.log(`Commits since ${tag}:`);
@@ -79,7 +79,7 @@ async function executeTag(
     if (output) {
       console.log(output.trimEnd());
     } else {
-      console.log("No commits since this tag.");
+      console.log("✨ No commits since this tag.");
     }
   }
 }

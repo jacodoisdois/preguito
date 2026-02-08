@@ -13,7 +13,7 @@ export function registerFixupCommand(program: Command): void {
         await executeFixup(hash, opts);
       } catch (error) {
         if (error instanceof PrequitoError) {
-          console.error(`Error: ${error.message}`);
+          console.error(`✖ ${error.message}`);
           process.exit(1);
         }
         throw error;
@@ -26,29 +26,29 @@ async function executeFixup(
   opts: Record<string, unknown>
 ): Promise<void> {
   if (!(await gitOps.isGitRepo())) {
-    console.error("Error: Not inside a git repository.");
+    console.error("✖ Not inside a git repository.");
     process.exit(1);
   }
 
-  console.log("Staging all changes...");
+  console.log("→ Staging all changes...");
   await gitOps.stageAll();
 
   if (!(await gitOps.hasStagedChanges())) {
-    console.error("Error: No staged changes to commit.");
+    console.error("✖ No staged changes to commit.");
     process.exit(1);
   }
 
-  console.log(`Creating fixup commit for ${hash}...`);
+  console.log(`→ Creating fixup commit for ${hash}...`);
   await gitOps.commitFixup(hash);
-  console.log("Fixup commit created.");
+  console.log("✔ Fixup commit created.");
 
   if (opts.force) {
-    console.log("Pushing (--force-with-lease)...");
+    console.log("→ Pushing (--force-with-lease)...");
     await gitOps.forcePushLease();
-    console.log("Pushed.");
+    console.log("✔ Pushed.");
   } else if (opts.push) {
-    console.log("Pushing...");
+    console.log("→ Pushing...");
     await gitOps.push();
-    console.log("Pushed.");
+    console.log("✔ Pushed.");
   }
 }

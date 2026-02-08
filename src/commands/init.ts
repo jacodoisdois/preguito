@@ -15,7 +15,7 @@ export function registerInitCommand(program: Command): void {
     .action(async (opts) => {
       if (opts.default) {
         const path = await writeConfig(DEFAULT_CONFIG);
-        console.log(`Config written to ${path}`);
+        console.log(`✔ Config written to ${path}`);
         return;
       }
       await interactiveInit();
@@ -26,7 +26,7 @@ async function interactiveInit(): Promise<void> {
   const rl = createInterface({ input: stdin, output: stdout });
 
   try {
-    console.log("Welcome to preguito setup!\n");
+    console.log("✨ Welcome to preguito setup!\n");
     console.log("Define your commit template.");
     console.log(
       "Use {{variable}} for named parameters and <message> for the commit message body."
@@ -59,8 +59,8 @@ async function interactiveInit(): Promise<void> {
 
     const config: PrequitoConfig = { template, defaults };
     const path = await writeConfig(config);
-    console.log(`\nConfig written to ${path}`);
-    console.log("Edit it anytime or run 'guito cfg' to view it.");
+    console.log(`\n✔ Config written to ${path}`);
+    console.log("  Edit it anytime or run 'guito cfg' to view it.");
   } finally {
     rl.close();
   }

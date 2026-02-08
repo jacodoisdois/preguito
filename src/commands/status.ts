@@ -12,7 +12,7 @@ export function registerStatusCommand(program: Command): void {
         await executeStatus();
       } catch (error) {
         if (error instanceof PrequitoError) {
-          console.error(`Error: ${error.message}`);
+          console.error(`✖ ${error.message}`);
           process.exit(1);
         }
         throw error;
@@ -22,7 +22,7 @@ export function registerStatusCommand(program: Command): void {
 
 async function executeStatus(): Promise<void> {
   if (!(await gitOps.isGitRepo())) {
-    console.error("Error: Not inside a git repository.");
+    console.error("✖ Not inside a git repository.");
     process.exit(1);
   }
 
@@ -30,6 +30,6 @@ async function executeStatus(): Promise<void> {
   if (output) {
     console.log(output.trimEnd());
   } else {
-    console.log("Nothing to commit, working tree clean.");
+    console.log("✨ Nothing to commit, working tree clean.");
   }
 }

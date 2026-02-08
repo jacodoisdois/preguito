@@ -12,7 +12,7 @@ export function registerUndoCommand(program: Command): void {
         await executeUndo(count);
       } catch (error) {
         if (error instanceof PrequitoError) {
-          console.error(`Error: ${error.message}`);
+          console.error(`✖ ${error.message}`);
           process.exit(1);
         }
         throw error;
@@ -22,19 +22,19 @@ export function registerUndoCommand(program: Command): void {
 
 async function executeUndo(count?: string): Promise<void> {
   if (!(await gitOps.isGitRepo())) {
-    console.error("Error: Not inside a git repository.");
+    console.error("✖ Not inside a git repository.");
     process.exit(1);
   }
 
   const num = count ? parseInt(count, 10) : 1;
   if (isNaN(num) || num <= 0) {
-    console.error("Error: Count must be a positive integer.");
+    console.error("✖ Count must be a positive integer.");
     process.exit(1);
   }
 
-  console.log(`Undoing last ${num} commit(s)...`);
+  console.log(`→ Undoing last ${num} commit(s)...`);
   await gitOps.resetSoft(num);
-  console.log(`Undid last ${num} commit(s). Changes are staged.`);
+  console.log(`✔ Undid last ${num} commit(s). Changes are staged.`);
 
   const st = await gitOps.status();
   if (st) console.log(st);

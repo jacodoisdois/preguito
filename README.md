@@ -18,8 +18,10 @@ git add -A && git commit -m "[PAYMENTS-42] feat(api): add login endpoint" && git
 
 ```bash
 guito c -m "add login endpoint" -p
-# Committing: [PAYMENTS-42] feat(api): add login endpoint
-# Pushed.
+# → Committing: [PAYMENTS-42] feat(api): add login endpoint
+# ✔ Committed.
+# → Pushing...
+# ✔ Pushed.
 ```
 
 The template fills in `[PAYMENTS-42] feat(api):` automatically from your config defaults. You can override any variable on the fly with `--variable value`.
@@ -53,7 +55,7 @@ guito init
 The wizard walks you through creating your config:
 
 ```
-Welcome to preguito setup!
+✨ Welcome to preguito setup!
 
 Define your commit template.
 Use {{variable}} for named parameters and <message> for the commit message body.
@@ -70,7 +72,8 @@ Set default values (press Enter to skip):
   type: feat
   scope: api
 
-Config written to /home/you/.config/preguito/config.json
+✔ Config written to /home/you/.config/preguito/config.json
+  Edit it anytime or run 'guito cfg' to view it.
 ```
 
 Or skip the wizard and use the default template (`{{type}}: <message>`):
@@ -102,14 +105,16 @@ The wizard creates a JSON file like this:
 
 ```bash
 guito c -m "add login endpoint" --card_id 42
-# Committing: [PAYMENTS-42] feat(api): add login endpoint
+# → Committing: [PAYMENTS-42] feat(api): add login endpoint
+# ✔ Committed.
 ```
 
 Override any default:
 
 ```bash
 guito c -m "fix timeout" --type fix --scope core --card_id 99
-# Committing: [PAYMENTS-99] fix(core): fix timeout
+# → Committing: [PAYMENTS-99] fix(core): fix timeout
+# ✔ Committed.
 ```
 
 Preview without committing:
@@ -121,290 +126,41 @@ guito c -m "test message" --card_id 10 -d
 
 ## Template System
 
-### Syntax
-
-| Token | Description | Example |
-|-------|-------------|---------|
-| `{{variable}}` | Named parameter, replaced from defaults or CLI flags | `{{type}}`, `{{squad}}` |
-| `<placeholder>` | Commit message body, filled by `-m` | `<message>`, `<desc>` |
-
-A template can have any number of `{{variables}}` and at most one `<placeholder>`.
-
-### Variable Resolution
-
-Variables are resolved in this order (highest priority first):
-
-1. **CLI flags** — `--type fix` overrides the default
-2. **Config defaults** — used when no CLI flag is given
-3. **Error** — if a variable has neither, preguito tells you what's missing
-
-### Template Examples
-
-**Minimal:**
-
-```
-{{type}}: <message>
-```
+Use `{{variable}}` for named parameters and `<placeholder>` for the commit message body. Variables resolve from CLI flags first, then config defaults.
 
 ```bash
-guito c -m "add login"
-# feat: add login
-```
-
-**Conventional commits:**
-
-```
-{{type}}({{scope}}): <message>
-```
-
-```bash
-guito c -m "fix timeout" --type fix --scope api
-# fix(api): fix timeout
-```
-
-**With ticket prefix:**
-
-```
-[{{squad}}-{{card_id}}] {{type}}({{scope}}): <message>
-```
-
-```bash
+# Template: [{{squad}}-{{card_id}}] {{type}}({{scope}}): <message>
 guito c -m "add login" --card_id 42
-# [PAYMENTS-42] feat(api): add login
+# → Committing: [PAYMENTS-42] feat(api): add login
+# ✔ Committed.
 ```
+
+See [template-system.md](docs/template-system.md) for full syntax, resolution order, and more examples.
 
 ## Commands
 
-### `guito c` / `guito commit`
+| Command | Alias | Description |
+|---------|-------|-------------|
+| `guito c -m "msg"` | `commit` | Templated commit with auto-stage |
+| `guito cf <hash>` | — | Create a fixup commit |
+| `guito ap` | — | Amend + force push |
+| `guito apl` | — | Amend + force push with lease |
+| `guito u [count]` | `undo` | Undo last N commits (soft reset) |
+| `guito pu` | — | Push with --set-upstream |
+| `guito r <branch>` | `rebase` | Quick rebase on branch |
+| `guito re <hash>` | — | Edit rebase at commit |
+| `guito ri <count>` | — | Interactive rebase last N commits |
+| `guito sw <branch>` | `switch` | Switch/create branch |
+| `guito st` | — | Stash changes |
+| `guito stp` | — | Pop latest stash |
+| `guito s` | `status` | Short status |
+| `guito l [count]` | `log` | Compact log (default: 10) |
+| `guito f <keyword>` | `find` | Search commits by message |
+| `guito t <tag>` | `tag` | Commits since/from a tag |
+| `guito i` | `init` | Setup wizard |
+| `guito cfg` | `config` | View configuration |
 
-Create a commit using your configured template.
-
-| Flag | Description |
-|------|-------------|
-| `-m, --message <text>` | **(required)** Commit message body |
-| `-p, --push` | Push after committing |
-| `-f, --force` | Push with `--force-with-lease` after committing |
-| `-d, --dry-run` | Print the rendered message without executing |
-| `-S, --no-stage` | Skip automatic `git add -A` |
-| `--<variable> <value>` | Override any template variable |
-
-By default, `guito c` runs `git add -A` before committing. Use `-S` to skip this and commit only what's already staged.
-
-```bash
-guito c -m "add feature"                         # commit with auto-stage
-guito c -m "add feature" -p                      # commit + push
-guito c -m "quick fix" -f                        # commit + force push (with lease)
-guito c -m "test" -d                             # dry run, just print the message
-guito c -m "staged only" -S                      # skip git add -A
-guito c -m "fix bug" --type fix --scope api      # override defaults
-```
-
-### `guito i` / `guito init`
-
-Interactive setup wizard to create your preguito config.
-
-| Flag | Description |
-|------|-------------|
-| `--default` | Skip prompts, use the default template |
-
-```bash
-guito init            # interactive wizard
-guito init --default  # use default: {{type}}: <message>
-```
-
-### `guito cfg` / `guito config`
-
-View current configuration.
-
-| Flag | Description |
-|------|-------------|
-| `--path` | Show only the config file path |
-| `--template` | Show only the template string |
-| `--variables` | Show template variables and their defaults |
-
-```bash
-guito cfg              # show everything
-guito cfg --path       # just the file path
-guito cfg --template   # just the template
-guito cfg --variables  # variables and their default values
-```
-
-### `guito ap`
-
-Amend the last commit with all current changes and force push (`git push --force`).
-
-```bash
-guito ap
-# Staging all changes...
-# Amending last commit...
-# Pushing (--force)...
-```
-
-### `guito apl`
-
-Amend the last commit with all current changes and force push with lease (`git push --force-with-lease`). Safer than `ap`.
-
-```bash
-guito apl
-# Staging all changes...
-# Amending last commit...
-# Pushing (--force-with-lease)...
-```
-
-### `guito r <branch>` / `guito rebase <branch>`
-
-Quick rebase: checks out the target branch, pulls latest, checks out your branch, rebases on top.
-
-```bash
-guito r main
-# Current branch: feature/login
-# Checking out main...
-# Pulling main...
-# Checking out feature/login...
-# Rebasing feature/login onto main...
-# Rebase complete.
-```
-
-Equivalent to:
-
-```bash
-git checkout main
-git pull
-git checkout feature/login
-git rebase main
-```
-
-### `guito re <hash>`
-
-Start an interactive rebase paused at the specified commit for editing.
-
-```bash
-guito re abc1234
-# Starting edit rebase on commit abc1234...
-# Rebase paused at the target commit. Make your changes, then run:
-#   git add . && git rebase --continue
-```
-
-### `guito ri <count>`
-
-Interactive rebase for the last N commits. Opens your editor so you can reorder, squash, edit, or drop commits.
-
-```bash
-guito ri 3
-# Starting interactive rebase for the last 3 commit(s)...
-# (opens your editor)
-```
-
-### `guito pu`
-
-Push current branch and set upstream tracking. Useful when pushing a new branch for the first time.
-
-```bash
-guito pu
-# Pushing with --set-upstream origin feature/login...
-# Pushed.
-```
-
-### `guito cf <hash>`
-
-Create a fixup commit targeting a specific commit. Stages all changes automatically. Use with `git rebase --autosquash` later to squash it into the target.
-
-| Flag | Description |
-|------|-------------|
-| `-p, --push` | Push after creating the fixup commit |
-| `-f, --force` | Push with `--force-with-lease` after creating |
-
-```bash
-guito cf abc1234            # create fixup commit
-guito cf abc1234 -p         # create fixup + push
-guito cf abc1234 -f         # create fixup + force push (with lease)
-```
-
-### `guito u [count]` / `guito undo [count]`
-
-Undo the last N commits with a soft reset. All changes remain staged so nothing is lost.
-
-```bash
-guito u              # undo last commit
-guito u 3            # undo last 3 commits
-# Undid last 3 commit(s). Changes are staged.
-```
-
-### `guito s` / `guito status`
-
-Show short git status.
-
-```bash
-guito s
-#  M src/cli.ts
-# ?? src/commands/push.ts
-```
-
-### `guito sw <branch>` / `guito switch <branch>`
-
-Switch branches, or create a new one with `-n`.
-
-| Flag | Description |
-|------|-------------|
-| `-n, --new` | Create a new branch |
-
-```bash
-guito sw main              # switch to main
-guito sw -n feature/login  # create and switch to new branch
-```
-
-### `guito st`
-
-Stash all current changes.
-
-```bash
-guito st
-# Saved working directory and index state WIP on main: ...
-```
-
-### `guito stp`
-
-Pop the latest stash.
-
-```bash
-guito stp
-# On branch main: ...
-```
-
-### `guito l [count]` / `guito log [count]`
-
-Show compact git log (default: last 10 commits).
-
-```bash
-guito l            # last 10 commits
-guito l 20         # last 20 commits
-```
-
-### `guito f <keyword>` / `guito find <keyword>`
-
-Search commits by message keyword across all branches.
-
-| Flag | Description |
-|------|-------------|
-| `-n, --number <count>` | Limit number of results |
-
-```bash
-guito f "login"            # find all commits mentioning "login"
-guito f "fix" -n 5         # find last 5 commits mentioning "fix"
-```
-
-### `guito t <tag>` / `guito tag <tag>`
-
-Show commits related to a tag. By default shows commits since the tag until HEAD. Use `--all` to show all commits reachable from the tag.
-
-| Flag | Description |
-|------|-------------|
-| `-a, --all` | Show all commits reachable from the tag |
-
-```bash
-guito t v1.0.0             # commits since v1.0.0 until HEAD
-guito t v1.0.0 --all       # all commits reachable from v1.0.0
-```
+See the [full command reference](docs/README.md) for detailed usage, flags, and examples.
 
 ## Configuration
 

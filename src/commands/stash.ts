@@ -11,7 +11,7 @@ export function registerStashCommands(program: Command): void {
         await executeStash();
       } catch (error) {
         if (error instanceof PrequitoError) {
-          console.error(`Error: ${error.message}`);
+          console.error(`✖ ${error.message}`);
           process.exit(1);
         }
         throw error;
@@ -26,7 +26,7 @@ export function registerStashCommands(program: Command): void {
         await executeStashPop();
       } catch (error) {
         if (error instanceof PrequitoError) {
-          console.error(`Error: ${error.message}`);
+          console.error(`✖ ${error.message}`);
           process.exit(1);
         }
         throw error;
@@ -36,7 +36,7 @@ export function registerStashCommands(program: Command): void {
 
 async function executeStash(): Promise<void> {
   if (!(await gitOps.isGitRepo())) {
-    console.error("Error: Not inside a git repository.");
+    console.error("✖ Not inside a git repository.");
     process.exit(1);
   }
 
@@ -46,7 +46,7 @@ async function executeStash(): Promise<void> {
 
 async function executeStashPop(): Promise<void> {
   if (!(await gitOps.isGitRepo())) {
-    console.error("Error: Not inside a git repository.");
+    console.error("✖ Not inside a git repository.");
     process.exit(1);
   }
 

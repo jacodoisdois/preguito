@@ -14,7 +14,7 @@ export function registerConfigCommand(program: Command): void {
       const config = await loadConfig();
 
       if (!config) {
-        console.log('No config found. Run "guito i" to create one.');
+        console.log('✖ No config found. Run "guito i" to create one.');
         return;
       }
 

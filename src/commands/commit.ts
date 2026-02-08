@@ -25,7 +25,7 @@ export function registerCommitCommand(program: Command): void {
         await executeCommit(opts, cmd);
       } catch (error) {
         if (error instanceof PrequitoError) {
-          console.error(`Error: ${error.message}`);
+          console.error(`✖ ${error.message}`);
           process.exit(1);
         }
         throw error;
@@ -38,7 +38,7 @@ async function executeCommit(
   cmd: Command
 ): Promise<void> {
   if (!(await gitOps.isGitRepo())) {
-    console.error("Error: Not inside a git repository.");
+    console.error("✖ Not inside a git repository.");
     process.exit(1);
   }
 
@@ -62,22 +62,22 @@ async function executeCommit(
   }
 
   if (!(await gitOps.hasStagedChanges())) {
-    console.error("Error: No staged changes to commit.");
+    console.error("✖ No staged changes to commit.");
     process.exit(1);
   }
 
-  console.log(`Committing: ${commitMessage}`);
+  console.log(`→ Committing: ${commitMessage}`);
   await gitOps.commit(commitMessage);
-  console.log("Committed.");
+  console.log("✔ Committed.");
 
   if (opts.force) {
-    console.log("Pushing (--force-with-lease)...");
+    console.log("→ Pushing (--force-with-lease)...");
     await gitOps.forcePushLease();
-    console.log("Pushed.");
+    console.log("✔ Pushed.");
   } else if (opts.push) {
-    console.log("Pushing...");
+    console.log("→ Pushing...");
     await gitOps.push();
-    console.log("Pushed.");
+    console.log("✔ Pushed.");
   }
 }
 
