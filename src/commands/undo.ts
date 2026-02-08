@@ -1,0 +1,41 @@
+import { Command } from "commander";
+import * as gitOps from "../git/operations.js";
+import { PrequitoError } from "../utils/errors.js";
+
+export function registerUndoCommand(program: Command): void {
+  program
+    .command("u [count]")
+    .alias("undo")
+    .description("Undo the last N commits (soft reset, changes stay staged)")
+    .action(async (count?: string) => {
+      try {
+        await executeUndo(count);
+      } catch (error) {
+        if (error instanceof PrequitoError) {
+          console.error(`Error: ${error.message}`);
+          process.exit(1);
+        }
+        throw error;
+      }
+    });
+}
+
+async function executeUndo(count?: string): Promise<void> {
+  if (!(await gitOps.isGitRepo())) {
+    console.error("Error: Not inside a git repository.");
+    process.exit(1);
+  }
+
+  const num = count ? parseInt(count, 10) : 1;
+  if (isNaN(num) || num <= 0) {
+    console.error("Error: Count must be a positive integer.");
+    process.exit(1);
+  }
+
+  console.log(`Undoing last ${num} commit(s)...`);
+  await gitOps.resetSoft(num);
+  console.log(`Undid last ${num} commit(s). Changes are staged.`);
+
+  const st = await gitOps.status();
+  if (st) console.log(st);
+}

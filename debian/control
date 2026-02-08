@@ -1,0 +1,9 @@
+Package: preguito
+Version: 0.1.0
+Section: devel
+Priority: optional
+Architecture: amd64
+Maintainer: jacodoisdois
+Description: A lazy git CLI tool with commit templates and shortcuts
+ preguito (guito) provides commit message templates with variable
+ interpolation and push/rebase shortcuts to speed up your git workflow.

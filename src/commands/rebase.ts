@@ -1,0 +1,108 @@
+import { Command } from "commander";
+import * as gitOps from "../git/operations.js";
+import { PrequitoError } from "../utils/errors.js";
+
+export function registerRebaseCommands(program: Command): void {
+  program
+    .command("r <branch>")
+    .alias("rebase")
+    .description(
+      "Quick rebase: checkout <branch>, pull, come back, rebase on top"
+    )
+    .action(async (branch: string) => {
+      try {
+        await quickRebase(branch);
+      } catch (error) {
+        if (error instanceof PrequitoError) {
+          console.error(`Error: ${error.message}`);
+          process.exit(1);
+        }
+        throw error;
+      }
+    });
+
+  program
+    .command("ri <count>")
+    .description(
+      "Interactive rebase: open editor for the last <count> commits"
+    )
+    .action(async (count: string) => {
+      try {
+        await interactiveRebase(count);
+      } catch (error) {
+        if (error instanceof PrequitoError) {
+          console.error(`Error: ${error.message}`);
+          process.exit(1);
+        }
+        throw error;
+      }
+    });
+
+  program
+    .command("re <hash>")
+    .description("Edit rebase: start interactive rebase with commit marked as edit")
+    .action(async (hash: string) => {
+      try {
+        await editRebase(hash);
+      } catch (error) {
+        if (error instanceof PrequitoError) {
+          console.error(`Error: ${error.message}`);
+          process.exit(1);
+        }
+        throw error;
+      }
+    });
+}
+
+async function quickRebase(branch: string): Promise<void> {
+  if (!(await gitOps.isGitRepo())) {
+    console.error("Error: Not inside a git repository.");
+    process.exit(1);
+  }
+
+  const currentBranch = await gitOps.getCurrentBranch();
+  console.log(`Current branch: ${currentBranch}`);
+
+  console.log(`Checking out ${branch}...`);
+  await gitOps.checkout(branch);
+
+  console.log(`Pulling ${branch}...`);
+  await gitOps.pull();
+
+  console.log(`Checking out ${currentBranch}...`);
+  await gitOps.checkout(currentBranch);
+
+  console.log(`Rebasing ${currentBranch} onto ${branch}...`);
+  await gitOps.rebase(branch);
+  console.log("Rebase complete.");
+}
+
+async function interactiveRebase(count: string): Promise<void> {
+  if (!(await gitOps.isGitRepo())) {
+    console.error("Error: Not inside a git repository.");
+    process.exit(1);
+  }
+
+  const num = parseInt(count, 10);
+  if (isNaN(num) || num <= 0) {
+    console.error("Error: Count must be a positive integer.");
+    process.exit(1);
+  }
+
+  console.log(`Starting interactive rebase for the last ${num} commit(s)...`);
+  await gitOps.rebaseInteractive(num);
+}
+
+async function editRebase(hash: string): Promise<void> {
+  if (!(await gitOps.isGitRepo())) {
+    console.error("Error: Not inside a git repository.");
+    process.exit(1);
+  }
+
+  console.log(`Starting edit rebase on commit ${hash}...`);
+  await gitOps.rebaseInteractiveEdit(hash);
+  console.log(
+    "Rebase paused at the target commit. Make your changes, then run:"
+  );
+  console.log("  git add . && git rebase --continue");
+}

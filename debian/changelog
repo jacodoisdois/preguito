@@ -1,0 +1,8 @@
+preguito (0.1.0) unstable; urgency=low
+
+  * Initial release.
+  * Commit templates with {{variable}} interpolation.
+  * Amend + push shortcuts (ap, apl).
+  * Quick rebase and edit rebase commands.
+
+ -- jacodoisdois  Sat, 08 Feb 2026 00:00:00 +0000
