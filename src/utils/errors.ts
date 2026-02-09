@@ -11,8 +11,7 @@ export class TemplateMissingVariableError extends PrequitoError {
   constructor(missing: string[]) {
     super(
       `Missing template variable(s): ${missing.join(", ")}. ` +
-        `Provide them via CLI flags (--${missing.join(", --")}) ` +
-        `or set defaults in your config file.`
+        `Provide shortcodes or check your config.`
     );
     this.name = "TemplateMissingVariableError";
     this.missingVariables = missing;
@@ -23,7 +22,7 @@ export class TemplateMissingMessageError extends PrequitoError {
   constructor(placeholderName: string) {
     super(
       `Template requires a message (the <${placeholderName}> placeholder). ` +
-        `Provide it with the -m flag.`
+        `Provide it as the last argument(s).`
     );
     this.name = "TemplateMissingMessageError";
   }

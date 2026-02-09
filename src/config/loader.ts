@@ -2,8 +2,14 @@ import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { homedir } from "node:os";
-import type { PrequitoConfig } from "./types.js";
-import { CONFIG_PATHS, DEFAULT_CONFIG } from "./types.js";
+import type { PrequitoConfig, PrequitoFeatures, ShortcodeEntry } from "./types.js";
+import {
+  CONFIG_PATHS,
+  DEFAULT_CONFIG,
+  PREDEFINED_TYPES,
+  PREDEFINED_ENVIRONMENTS,
+} from "./types.js";
+import { parseTemplate } from "../template/engine.js";
 
 export async function findConfigPath(): Promise<string | null> {
   const cwd = process.cwd();
@@ -49,6 +55,7 @@ function validateConfig(obj: unknown): PrequitoConfig {
     throw new Error('Config must have a non-empty "template" string field');
   }
 
+  // Parse defaults
   const defaults: Record<string, string> = {};
   if (config.defaults !== undefined) {
     if (typeof config.defaults !== "object" || config.defaults === null) {
@@ -64,7 +71,73 @@ function validateConfig(obj: unknown): PrequitoConfig {
     }
   }
 
-  return { template: config.template, defaults };
+  // Features: explicit or inferred from template
+  let features: PrequitoFeatures;
+  if (config.features && typeof config.features === "object") {
+    const f = config.features as Record<string, unknown>;
+    features = {
+      cardId: Boolean(f.cardId),
+      type: Boolean(f.type),
+      environment: Boolean(f.environment),
+    };
+  } else {
+    features = inferFeaturesFromTemplate(config.template as string);
+  }
+
+  // Types array
+  let types: ShortcodeEntry[] = [];
+  if (Array.isArray(config.types)) {
+    types = validateShortcodeArray(config.types, "types");
+  } else if (features.type) {
+    types = [...PREDEFINED_TYPES];
+  }
+
+  // Environments array
+  let environments: ShortcodeEntry[] = [];
+  if (Array.isArray(config.environments)) {
+    environments = validateShortcodeArray(config.environments, "environments");
+  } else if (features.environment) {
+    environments = [...PREDEFINED_ENVIRONMENTS];
+  }
+
+  return { template: config.template as string, features, types, environments, defaults };
+}
+
+function inferFeaturesFromTemplate(template: string): PrequitoFeatures {
+  const parsed = parseTemplate(template);
+  return {
+    cardId: parsed.variables.includes("card_id"),
+    type: parsed.variables.includes("type"),
+    environment: parsed.variables.includes("environment"),
+  };
+}
+
+function validateShortcodeArray(
+  arr: unknown[],
+  fieldName: string
+): ShortcodeEntry[] {
+  const result: ShortcodeEntry[] = [];
+  for (let i = 0; i < arr.length; i++) {
+    const item = arr[i];
+    if (
+      typeof item !== "object" ||
+      item === null ||
+      typeof (item as Record<string, unknown>).key !== "string" ||
+      typeof (item as Record<string, unknown>).label !== "string"
+    ) {
+      throw new Error(
+        `${fieldName}[${i}] must be an object with "key" and "label" string fields`
+      );
+    }
+    const entry = item as ShortcodeEntry;
+    if (entry.key.length !== 1) {
+      throw new Error(
+        `${fieldName}[${i}].key must be a single character, got "${entry.key}"`
+      );
+    }
+    result.push({ key: entry.key, label: entry.label });
+  }
+  return result;
 }
 
 export async function writeConfig(config: PrequitoConfig): Promise<string> {

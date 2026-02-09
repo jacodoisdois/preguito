@@ -1,10 +1,7 @@
 import { Command } from "commander";
 import { loadConfigOrDefault } from "../config/loader.js";
-import {
-  parseTemplate,
-  renderTemplate,
-  mergeContext,
-} from "../template/engine.js";
+import { renderTemplate } from "../template/engine.js";
+import { parsePositionalArgs } from "./commit-parser.js";
 import * as gitOps from "../git/operations.js";
 import { PrequitoError } from "../utils/errors.js";
 
@@ -13,19 +10,17 @@ export function registerCommitCommand(program: Command): void {
     .command("c")
     .alias("commit")
     .description("Create a commit using your template")
-    .requiredOption("-m, --message <text>", "The commit message body")
+    .argument("[args...]", "Card ID, shortcodes, and message")
     .option("-p, --push", "Push after committing")
     .option("-f, --force", "Push with --force-with-lease after committing")
     .option("-d, --dry-run", "Show the generated message without executing")
     .option("-S, --no-stage", "Skip auto-staging (git add -A)")
-    .allowUnknownOption(true)
-    .allowExcessArguments(true)
-    .action(async (opts, cmd) => {
+    .action(async (args: string[], opts: Record<string, unknown>) => {
       try {
-        await executeCommit(opts, cmd);
+        await executeCommit(args, opts);
       } catch (error) {
         if (error instanceof PrequitoError) {
-          console.error(`✖ ${error.message}`);
+          console.error(`\u2716 ${error.message}`);
           process.exit(1);
         }
         throw error;
@@ -34,65 +29,43 @@ export function registerCommitCommand(program: Command): void {
 }
 
 async function executeCommit(
-  opts: Record<string, unknown>,
-  cmd: Command
+  args: string[],
+  opts: Record<string, unknown>
 ): Promise<void> {
   if (!(await gitOps.isGitRepo())) {
-    console.error("✖ Not inside a git repository.");
+    console.error("\u2716 Not inside a git repository.");
     process.exit(1);
   }
 
   const config = await loadConfigOrDefault();
-  const dynamicVars = parseDynamicFlags(cmd.args);
-  const context = mergeContext(config.defaults, dynamicVars);
-  const commitMessage = renderTemplate(
-    config.template,
-    context,
-    opts.message as string
-  );
+  const { context, message } = parsePositionalArgs(args, config);
+  const commitMessage = renderTemplate(config.template, context, message);
 
   if (opts.dryRun) {
     console.log(commitMessage);
     return;
   }
 
-  // Stage changes (unless --no-stage)
   if (opts.stage !== false) {
     await gitOps.stageAll();
   }
 
   if (!(await gitOps.hasStagedChanges())) {
-    console.error("✖ No staged changes to commit.");
+    console.error("\u2716 No staged changes to commit.");
     process.exit(1);
   }
 
-  console.log(`→ Committing: ${commitMessage}`);
+  console.log(`\u2192 Committing: ${commitMessage}`);
   await gitOps.commit(commitMessage);
-  console.log("✔ Committed.");
+  console.log("\u2714 Committed.");
 
   if (opts.force) {
-    console.log("→ Pushing (--force-with-lease)...");
+    console.log("\u2192 Pushing (--force-with-lease)...");
     await gitOps.forcePushLease();
-    console.log("✔ Pushed.");
+    console.log("\u2714 Pushed.");
   } else if (opts.push) {
-    console.log("→ Pushing...");
+    console.log("\u2192 Pushing...");
     await gitOps.push();
-    console.log("✔ Pushed.");
+    console.log("\u2714 Pushed.");
   }
-}
-
-function parseDynamicFlags(args: string[]): Record<string, string> {
-  const result: Record<string, string> = {};
-  for (let i = 0; i < args.length; i++) {
-    const arg = args[i];
-    if (arg.startsWith("--") && i + 1 < args.length) {
-      const key = arg.slice(2);
-      const value = args[i + 1];
-      if (!value.startsWith("--")) {
-        result[key] = value;
-        i++;
-      }
-    }
-  }
-  return result;
 }
