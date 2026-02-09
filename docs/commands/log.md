@@ -26,3 +26,8 @@ guito l 20
 ```bash
 git log --oneline -n <count>
 ```
+
+## See Also
+
+- [find](find.md) — search commits by keyword
+- [status](status.md) — short working tree status

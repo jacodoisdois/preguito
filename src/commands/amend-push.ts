@@ -1,11 +1,12 @@
 import { Command } from "commander";
 import * as gitOps from "../git/operations.js";
 import { PrequitoError } from "../utils/errors.js";
+import { spinner } from "../utils/spinner.js";
 
 export function registerAmendPushCommands(program: Command): void {
   program
     .command("ap")
-    .description("Amend last commit + git push --force")
+    .description("Amend last commit + force push (git push --force)")
     .action(async () => {
       try {
         await amendAndPush(false);
@@ -20,7 +21,7 @@ export function registerAmendPushCommands(program: Command): void {
 
   program
     .command("apl")
-    .description("Amend last commit + git push --force-with-lease")
+    .description("Amend last commit + safe force push (--force-with-lease)")
     .action(async () => {
       try {
         await amendAndPush(true);
@@ -48,11 +49,12 @@ async function amendAndPush(useLease: boolean): Promise<void> {
   console.log("✔ Amended.");
 
   if (useLease) {
-    console.log("→ Pushing (--force-with-lease)...");
+    const stop = spinner("Pushing (--force-with-lease)...");
     await gitOps.forcePushLease();
+    stop("✔ Pushed.");
   } else {
-    console.log("→ Pushing (--force)...");
+    const stop = spinner("Pushing (--force)...");
     await gitOps.forcePush();
+    stop("✔ Pushed.");
   }
-  console.log("✔ Pushed.");
 }

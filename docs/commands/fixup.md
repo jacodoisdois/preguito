@@ -53,3 +53,8 @@ git rebase -i --autosquash HEAD~5
 ```
 
 The `--autosquash` flag will automatically reorder and mark fixup commits for squashing.
+
+## See Also
+
+- [commit](commit.md) — create a templated commit
+- [rebase](rebase.md) — interactive rebase to squash fixups

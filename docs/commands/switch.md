@@ -34,3 +34,7 @@ guito sw -n feature/login
 git checkout <branch>       # without -n
 git checkout -b <branch>    # with -n
 ```
+
+## See Also
+
+- [stash](stash.md) — stash changes before switching branches

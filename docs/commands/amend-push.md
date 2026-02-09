@@ -49,3 +49,8 @@ git push --force-with-lease
 
 - `ap` — when you're the only one working on the branch and want speed
 - `apl` — when others might have pushed to the same branch (prevents overwriting their work)
+
+## See Also
+
+- [commit](commit.md) — create a templated commit
+- [push](push.md) — push with upstream tracking

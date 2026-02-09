@@ -6,7 +6,7 @@ export function registerStatusCommand(program: Command): void {
   program
     .command("s")
     .alias("status")
-    .description("Show short git status")
+    .description("Short status (git status --short)")
     .action(async () => {
       try {
         await executeStatus();

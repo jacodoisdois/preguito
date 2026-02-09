@@ -25,3 +25,8 @@ guito s
 ```bash
 git status --short
 ```
+
+## See Also
+
+- [log](log.md) — compact commit log
+- [commit](commit.md) — commit staged changes

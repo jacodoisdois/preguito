@@ -4,12 +4,13 @@ import { renderTemplate } from "../template/engine.js";
 import { parsePositionalArgs } from "./commit-parser.js";
 import * as gitOps from "../git/operations.js";
 import { PrequitoError } from "../utils/errors.js";
+import { spinner } from "../utils/spinner.js";
 
 export function registerCommitCommand(program: Command): void {
   program
     .command("c")
     .alias("commit")
-    .description("Create a commit using your template")
+    .description("Templated commit (e.g. guito c 42 f \"msg\" -p)")
     .argument("[args...]", "Card ID, shortcodes, and message")
     .option("-p, --push", "Push after committing")
     .option("-f, --force", "Push with --force-with-lease after committing")
@@ -60,12 +61,12 @@ async function executeCommit(
   console.log("\u2714 Committed.");
 
   if (opts.force) {
-    console.log("\u2192 Pushing (--force-with-lease)...");
+    const stop = spinner("Pushing (--force-with-lease)...");
     await gitOps.forcePushLease();
-    console.log("\u2714 Pushed.");
+    stop("✔ Pushed.");
   } else if (opts.push) {
-    console.log("\u2192 Pushing...");
+    const stop = spinner("Pushing...");
     await gitOps.push();
-    console.log("\u2714 Pushed.");
+    stop("✔ Pushed.");
   }
 }

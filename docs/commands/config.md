@@ -45,3 +45,8 @@ guito cfg --variables
 #   type: feat
 #   scope: api
 ```
+
+## See Also
+
+- [init](init.md) — run the setup wizard to create or reconfigure
+- [Template System](../template-system.md) — how templates and shortcodes work

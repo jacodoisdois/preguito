@@ -60,3 +60,8 @@ A JSON config file at `~/.config/preguito/config.json`:
 ```
 
 See [template-system.md](../template-system.md) for how templates work.
+
+## See Also
+
+- [config](config.md) — view your current configuration
+- [Template System](../template-system.md) — how templates and shortcodes work

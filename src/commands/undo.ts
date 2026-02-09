@@ -6,7 +6,7 @@ export function registerUndoCommand(program: Command): void {
   program
     .command("u [count]")
     .alias("undo")
-    .description("Undo the last N commits (soft reset, changes stay staged)")
+    .description("Undo last N commits, keep changes staged (e.g. guito u 3)")
     .action(async (count?: string) => {
       try {
         await executeUndo(count);

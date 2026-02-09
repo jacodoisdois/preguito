@@ -54,3 +54,8 @@ Equivalent to:
 ```bash
 git rebase -i HEAD~3
 ```
+
+## See Also
+
+- [fixup](fixup.md) — create fixup commits to squash later
+- [undo](undo.md) — undo commits if rebase goes wrong

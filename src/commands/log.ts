@@ -6,7 +6,7 @@ export function registerLogCommand(program: Command): void {
   program
     .command("l [count]")
     .alias("log")
-    .description("Show compact git log (default: last 10 commits)")
+    .description("Compact log, default last 10 (e.g. guito l 20)")
     .action(async (count?: string) => {
       try {
         await executeLog(count);

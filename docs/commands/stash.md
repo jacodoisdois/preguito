@@ -34,3 +34,7 @@ git stash
 ```bash
 git stash pop
 ```
+
+## See Also
+
+- [switch](switch.md) — switch branches (stash first if needed)

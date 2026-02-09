@@ -32,3 +32,8 @@ git status --short
 ```
 
 Uses `--soft` so all changes from the undone commits remain staged. You can re-commit them, edit them, or discard them as needed.
+
+## See Also
+
+- [log](log.md) — inspect commit history
+- [commit](commit.md) — create a new commit after undoing

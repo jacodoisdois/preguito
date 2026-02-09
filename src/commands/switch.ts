@@ -6,7 +6,7 @@ export function registerSwitchCommand(program: Command): void {
   program
     .command("sw <branch>")
     .alias("switch")
-    .description("Switch branches (use -n to create a new branch)")
+    .description("Switch branch, -n to create (e.g. guito sw -n feature/x)")
     .option("-n, --new", "Create a new branch")
     .action(async (branch: string, opts: Record<string, unknown>) => {
       try {

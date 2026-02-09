@@ -5,7 +5,7 @@ import { PrequitoError } from "../utils/errors.js";
 export function registerStashCommands(program: Command): void {
   program
     .command("st")
-    .description("Stash all changes")
+    .description("Stash all changes (git stash)")
     .action(async () => {
       try {
         await executeStash();
@@ -20,7 +20,7 @@ export function registerStashCommands(program: Command): void {
 
   program
     .command("stp")
-    .description("Pop the latest stash")
+    .description("Pop the latest stash (git stash pop)")
     .action(async () => {
       try {
         await executeStashPop();
@@ -40,8 +40,9 @@ async function executeStash(): Promise<void> {
     process.exit(1);
   }
 
-  const output = await gitOps.stash();
-  console.log(output.trimEnd());
+  console.log("→ Stashing changes...");
+  await gitOps.stash();
+  console.log("✔ Stashed.");
 }
 
 async function executeStashPop(): Promise<void> {
@@ -50,6 +51,7 @@ async function executeStashPop(): Promise<void> {
     process.exit(1);
   }
 
-  const output = await gitOps.stashPop();
-  console.log(output.trimEnd());
+  console.log("→ Restoring stashed changes...");
+  await gitOps.stashPop();
+  console.log("✔ Restored.");
 }

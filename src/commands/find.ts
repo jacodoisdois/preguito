@@ -6,7 +6,7 @@ export function registerFindCommands(program: Command): void {
   program
     .command("f <keyword>")
     .alias("find")
-    .description("Search commits by message keyword")
+    .description("Search commits by message (e.g. guito f \"login\")")
     .option("-n, --number <count>", "Limit number of results")
     .action(async (keyword: string, opts: Record<string, unknown>) => {
       try {
@@ -23,7 +23,7 @@ export function registerFindCommands(program: Command): void {
   program
     .command("t <tag>")
     .alias("tag")
-    .description("Show commits for a tag (default: tag..HEAD, --all: all commits reachable from tag)")
+    .description("Commits since <tag> (e.g. guito t v1.0.0)")
     .option("-a, --all", "Show all commits reachable from the tag")
     .action(async (tag: string, opts: Record<string, unknown>) => {
       try {
@@ -66,7 +66,7 @@ async function executeTag(
   }
 
   if (opts.all) {
-    console.log(`Commits reachable from ${tag}:`);
+    console.log(`🏷️  Commits reachable from ${tag}:`);
     const output = await gitOps.logTagAll(tag);
     if (output) {
       console.log(output.trimEnd());
@@ -74,7 +74,7 @@ async function executeTag(
       console.log("✨ No commits found.");
     }
   } else {
-    console.log(`Commits since ${tag}:`);
+    console.log(`🏷️  Commits since ${tag}:`);
     const output = await gitOps.logTag(tag);
     if (output) {
       console.log(output.trimEnd());

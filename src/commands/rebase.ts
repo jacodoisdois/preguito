@@ -1,13 +1,14 @@
 import { Command } from "commander";
 import * as gitOps from "../git/operations.js";
 import { PrequitoError } from "../utils/errors.js";
+import { spinner } from "../utils/spinner.js";
 
 export function registerRebaseCommands(program: Command): void {
   program
     .command("r <branch>")
     .alias("rebase")
     .description(
-      "Quick rebase: checkout <branch>, pull, come back, rebase on top"
+      "Rebase on <branch> (checkout, pull, rebase) (e.g. guito r main)"
     )
     .action(async (branch: string) => {
       try {
@@ -24,7 +25,7 @@ export function registerRebaseCommands(program: Command): void {
   program
     .command("ri <count>")
     .description(
-      "Interactive rebase: open editor for the last <count> commits"
+      "Interactive rebase last <count> commits (e.g. guito ri 3)"
     )
     .action(async (count: string) => {
       try {
@@ -40,7 +41,7 @@ export function registerRebaseCommands(program: Command): void {
 
   program
     .command("re <hash>")
-    .description("Edit rebase: start interactive rebase with commit marked as edit")
+    .description("Edit rebase at <hash> (e.g. guito re abc123)")
     .action(async (hash: string) => {
       try {
         await editRebase(hash);
@@ -63,18 +64,21 @@ async function quickRebase(branch: string): Promise<void> {
   const currentBranch = await gitOps.getCurrentBranch();
   console.log(`→ Current branch: ${currentBranch}`);
 
-  console.log(`→ Checking out ${branch}...`);
+  let stop = spinner(`Checking out ${branch}...`);
   await gitOps.checkout(branch);
+  stop(`✔ Checked out ${branch}.`);
 
-  console.log(`→ Pulling ${branch}...`);
+  stop = spinner(`Pulling ${branch}...`);
   await gitOps.pull();
+  stop(`✔ Pulled ${branch}.`);
 
-  console.log(`→ Checking out ${currentBranch}...`);
+  stop = spinner(`Checking out ${currentBranch}...`);
   await gitOps.checkout(currentBranch);
+  stop(`✔ Checked out ${currentBranch}.`);
 
-  console.log(`→ Rebasing ${currentBranch} onto ${branch}...`);
+  stop = spinner(`Rebasing ${currentBranch} onto ${branch}...`);
   await gitOps.rebase(branch);
-  console.log("✔ Rebase complete.");
+  stop("✔ Rebase complete.");
 }
 
 async function interactiveRebase(count: string): Promise<void> {

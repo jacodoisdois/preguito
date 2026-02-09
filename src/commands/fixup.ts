@@ -1,11 +1,12 @@
 import { Command } from "commander";
 import * as gitOps from "../git/operations.js";
 import { PrequitoError } from "../utils/errors.js";
+import { spinner } from "../utils/spinner.js";
 
 export function registerFixupCommand(program: Command): void {
   program
     .command("cf <hash>")
-    .description("Create a fixup commit targeting a specific commit")
+    .description("Fixup commit for <hash> (e.g. guito cf abc123 -f)")
     .option("-p, --push", "Push after creating the fixup commit")
     .option("-f, --force", "Push with --force-with-lease after creating")
     .action(async (hash: string, opts: Record<string, unknown>) => {
@@ -43,12 +44,12 @@ async function executeFixup(
   console.log("✔ Fixup commit created.");
 
   if (opts.force) {
-    console.log("→ Pushing (--force-with-lease)...");
+    const stop = spinner("Pushing (--force-with-lease)...");
     await gitOps.forcePushLease();
-    console.log("✔ Pushed.");
+    stop("✔ Pushed.");
   } else if (opts.push) {
-    console.log("→ Pushing...");
+    const stop = spinner("Pushing...");
     await gitOps.push();
-    console.log("✔ Pushed.");
+    stop("✔ Pushed.");
   }
 }

@@ -65,3 +65,7 @@ guito t v1.0.0 --all
 git log --oneline v1.0.0..HEAD    # default
 git log --oneline v1.0.0          # with --all
 ```
+
+## See Also
+
+- [log](log.md) — compact commit log

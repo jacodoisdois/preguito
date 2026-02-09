@@ -19,7 +19,7 @@ export function registerInitCommand(program: Command): void {
   program
     .command("i")
     .alias("init")
-    .description("Interactive setup to create your preguito config")
+    .description("Setup wizard to create your preguito config")
     .option("--default", "Use default config without prompts")
     .action(async (opts) => {
       if (opts.default) {
