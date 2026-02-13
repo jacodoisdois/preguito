@@ -1,6 +1,6 @@
 {
   "name": "preguito",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A lazy git CLI tool with commit templates and shortcuts",
   "type": "module",
   "bin": {
