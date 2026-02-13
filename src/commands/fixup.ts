@@ -31,17 +31,18 @@ async function executeFixup(
     process.exit(1);
   }
 
-  console.log("→ Staging all changes...");
+  const stopStage = spinner("Staging all changes...");
   await gitOps.stageAll();
+  stopStage("✔ Staged.");
 
   if (!(await gitOps.hasStagedChanges())) {
     console.error("✖ No staged changes to commit.");
     process.exit(1);
   }
 
-  console.log(`→ Creating fixup commit for ${hash}...`);
+  const stopCommit = spinner(`Creating fixup commit for ${hash}...`);
   await gitOps.commitFixup(hash);
-  console.log("✔ Fixup commit created.");
+  stopCommit("✔ Fixup commit created.");
 
   if (opts.force) {
     const stop = spinner("Pushing (--force-with-lease)...");

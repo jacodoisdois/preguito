@@ -1,6 +1,7 @@
 import { Command } from "commander";
 import * as gitOps from "../git/operations.js";
 import { PrequitoError } from "../utils/errors.js";
+import { spinner } from "../utils/spinner.js";
 
 export function registerStashCommands(program: Command): void {
   program
@@ -40,9 +41,9 @@ async function executeStash(): Promise<void> {
     process.exit(1);
   }
 
-  console.log("→ Stashing changes...");
+  const stop = spinner("Stashing changes...");
   await gitOps.stash();
-  console.log("✔ Stashed.");
+  stop("✔ Stashed.");
 }
 
 async function executeStashPop(): Promise<void> {
@@ -51,7 +52,7 @@ async function executeStashPop(): Promise<void> {
     process.exit(1);
   }
 
-  console.log("→ Restoring stashed changes...");
+  const stop = spinner("Restoring stashed changes...");
   await gitOps.stashPop();
-  console.log("✔ Restored.");
+  stop("✔ Restored.");
 }

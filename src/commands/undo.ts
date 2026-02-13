@@ -1,6 +1,7 @@
 import { Command } from "commander";
 import * as gitOps from "../git/operations.js";
 import { PrequitoError } from "../utils/errors.js";
+import { spinner } from "../utils/spinner.js";
 
 export function registerUndoCommand(program: Command): void {
   program
@@ -32,9 +33,9 @@ async function executeUndo(count?: string): Promise<void> {
     process.exit(1);
   }
 
-  console.log(`→ Undoing last ${num} commit(s)...`);
+  const stop = spinner(`Undoing last ${num} commit(s)...`);
   await gitOps.resetSoft(num);
-  console.log(`✔ Undid last ${num} commit(s). Changes are staged.`);
+  stop(`✔ Undid last ${num} commit(s). Changes are staged.`);
 
   const st = await gitOps.status();
   if (st) console.log(st);

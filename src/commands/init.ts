@@ -15,6 +15,47 @@ import {
   PREDEFINED_ENVIRONMENTS,
 } from "../config/types.js";
 
+const SLOTH_BANNER = [
+  "",
+  "          ⢿⣿⣿⠿⠿⠿⠻⠿⢿⡿⣿",
+  "     ⣿⡿⠟⠉⠈⠉⠉⠄⢠⠄⠄⢀⠄⠄⡬⠛⢿⢿⣿⣿",
+  "  ⣿⡿⡿⠉⠄⠄⠄⠄⠄⠄⠅⠄⠅⠄⠐⠄⠄⠄⠁⠤⠄⠛⢿⢿⣿",
+  " ⣿⣿⠍⠄⠄⠄⠄⠄⠄⠄⠄⣀⣀⠄⣀⣠⣀⠄⢈⣑⣢⣤⡄⠔⠫⢻⣿⣿",
+  "⣿⡏⠂⠄⠄⢀⣠⣤⣤⣶⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣮⣔⠂⡙⣿⣿",
+  "⡿⠄⠄⣠⣼⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣦⣈⣿",
+  "⠇⠄⢠⣿⣿⣿⣿⣿⡿⠿⣿⣿⣿⣿⣿⣿⣿⣿⡟⠿⠿⢿⡿⣿⣿⣿⣿⣿⡧⣼",
+  "⠄⠄⠽⠿⠟⠋⠁⠙⠄⢠⣿⡿⢿⣿⣿⣿⣿⣿⣷⡠⢌⣧⠄⠈⠛⠉⠛⠐⡋⢹",
+  "⠄⠄⠄⠄⠄⠄⠄⢀⣠⣾⡿⠑⠚⠋⠛⠛⠻⢿⣿⣿⣶⣤⡄⢀⣀⣀⡀⠈⠄⢸",
+  "⣄⠄⠄⠄⢰⣾⠟⠋⠛⠛⠂⠄⠄⠄⠄⠒⠂⠛⡿⢟⠻⠃⠄⢼⣿⣿⣷⠤⠁⢸",
+  "⣿⡄⠄⢀⢝⢓⠄⠄⠄⠄⠄⠄⠄⠄⠠⠠⠶⢺⣿⣯⣵⣦⣴⣿⣿⣿⣿⡏⠄⢸",
+  " ⣿⡀⠄⠈⠄⠄⠄⠠⢾⣷⣄⢄⣀⡈⡀⠠⣾⣿⣿⣿⣿⣿⣿⣿⡿⠿⢏⣀⣾",
+  "  ⣷⣄⠄⠄⠄⢀⠈⠈⠙⠑⠗⠙⠙⠛⠄⠈⠹⠻⢿⡻⣿⠿⢿⣝⡑⢫⣾",
+  "    ⣿⣆⡀⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠑⠐⠚⣨⣤⣾",
+  "",
+  "        🦥  p r e g u i t o",
+  "         lazy git, happy dev",
+  "",
+  "     ✨ Welcome to the setup wizard!",
+  "",
+];
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function printFeedback(enabled: boolean, featureName: string): void {
+  const symbol = enabled ? "✓" : "○";
+  const status = enabled ? "will be included" : "will be skipped";
+  console.log(`     ${symbol} ${featureName} ${status}\n`);
+}
+
+async function printBanner(): Promise<void> {
+  for (const line of SLOTH_BANNER) {
+    console.log(line);
+    await sleep(60);
+  }
+}
+
 export function registerInitCommand(program: Command): void {
   program
     .command("i")
@@ -35,24 +76,34 @@ async function interactiveInit(): Promise<void> {
   const rl = createInterface({ input: stdin, output: stdout });
 
   try {
-    console.log("\n✨ Welcome to preguito setup!\n");
+    await printBanner();
 
     // Step 1: Feature selection
     console.log("📋 Choose which features to enable:\n");
-    const features: PrequitoFeatures = {
-      cardId: await askYesNo(rl, "  🎫 Include card/ticket ID in commits?"),
-      type: await askYesNo(rl, "  🏷️  Include commit type (feat, fix, chore...)?"),
-      environment: await askYesNo(rl, "  🌍 Include environment (prd, uat, dev...)?"),
-    };
+
+    const cardId = await askYesNo(rl, "  🎫 Include card/ticket ID in commits?");
+    printFeedback(cardId, "Card ID");
+
+    const type = await askYesNo(rl, "  🏷️  Include commit type (feat, fix, chore...)?");
+    printFeedback(type, "Commit type");
+
+    const environment = await askYesNo(rl, "  🌍 Include environment (prd, uat, dev...)?");
+    printFeedback(environment, "Environment");
+
+    const features: PrequitoFeatures = { cardId, type, environment };
 
     // Step 2: Prefix (if cardId enabled)
     const defaults: Record<string, string> = {};
     if (features.cardId) {
       const prefix = await rl.question(
-        "\n🔤 Project prefix/sigla (e.g. PROJ, leave empty to skip): "
+        "\n🔤 Project prefix/acronym (e.g. PROJ, leave empty to skip): "
       );
-      if (prefix.trim()) {
-        defaults.prefix = prefix.trim().toUpperCase();
+      const trimmedPrefix = prefix.trim();
+      if (trimmedPrefix) {
+        defaults.prefix = trimmedPrefix.toUpperCase();
+        console.log(`     ✓ Prefix set to "${defaults.prefix}"\n`);
+      } else {
+        console.log(`     ○ No prefix configured\n`);
       }
     }
 
@@ -76,8 +127,11 @@ async function interactiveInit(): Promise<void> {
         types = [...PREDEFINED_TYPES];
       }
 
-      console.log("\n✏️  Customize shortcode letters (Enter to keep default):\n");
+      console.log(`     ✓ ${types.length} type(s) selected: ${types.map((t) => t.label).join(", ")}\n`);
+
+      console.log("✏️  Customize shortcode letters (Enter to keep default):\n");
       types = await customizeKeys(rl, types);
+      console.log(`     ✓ Shortcodes configured\n`);
     }
 
     // Step 4: Environments
@@ -98,8 +152,11 @@ async function interactiveInit(): Promise<void> {
         environments = [...PREDEFINED_ENVIRONMENTS];
       }
 
-      console.log("\n✏️  Customize shortcode letters (Enter to keep default):\n");
+      console.log(`     ✓ ${environments.length} environment(s) selected: ${environments.map((e) => e.label).join(", ")}\n`);
+
+      console.log("✏️  Customize shortcode letters (Enter to keep default):\n");
       environments = await customizeKeys(rl, environments);
+      console.log(`     ✓ Shortcodes configured\n`);
     }
 
     // Step 5: Validate and resolve letter conflicts
@@ -141,6 +198,22 @@ async function interactiveInit(): Promise<void> {
     // Summary
     console.log("\n─────────────────────────────────────");
     console.log("✅ Setup complete!\n");
+
+    const SLOTH_DONE = [
+      "              ╭────────────────╮",
+      "              │ ╭──╮      ╭──╮ │",
+      "              │ │⌐■│      │■ │ │",
+      "              │ ╰──╯  ᴥ   ╰──╯ │",
+      "              │     .────.     │",
+      "              ╰────────────────╯",
+      "       all set, now go be lazy 🦥",
+    ];
+    for (const line of SLOTH_DONE) {
+      console.log(line);
+      await sleep(40);
+    }
+
+    console.log("");
     console.log(`  📄 Config saved to ${path}`);
     console.log(`  📝 Template: ${template}`);
 

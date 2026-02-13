@@ -114,12 +114,8 @@ export function resolveShortcodes(
     );
   }
 
-  if (config.features.environment && !foundEnv) {
-    throw new PrequitoError(
-      `No environment shortcode found in "${shortcodesStr}". ` +
-        `Valid environments: ${config.environments.map((e) => `${e.key}=${e.label}`).join(", ")}`
-    );
-  }
+  // Environment is optional - if not provided, it won't be in the context
+  // and will be cleaned up from the template automatically
 
   return result;
 }

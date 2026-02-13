@@ -1,6 +1,7 @@
 import { Command } from "commander";
 import * as gitOps from "../git/operations.js";
 import { PrequitoError } from "../utils/errors.js";
+import { spinner } from "../utils/spinner.js";
 
 export function registerFindCommands(program: Command): void {
   program
@@ -48,7 +49,11 @@ async function executeFind(
   }
 
   const count = opts.number ? parseInt(opts.number as string, 10) : undefined;
+
+  const stop = spinner(`Searching for "${keyword}"...`);
   const output = await gitOps.logGrep(keyword, count);
+  stop(""); // Clear spinner
+
   if (output) {
     console.log(output.trimEnd());
   } else {

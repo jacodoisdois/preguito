@@ -32,6 +32,23 @@ export function parseTemplate(template: string): ParsedTemplate {
   return { variables, messagePlaceholder };
 }
 
+function cleanupEmptyPatterns(text: string): string {
+  return (
+    text
+      // Remove empty parentheses: () → ""
+      .replace(/\(\s*\)/g, "")
+      // Remove empty brackets: [] → ""
+      .replace(/\[\s*\]/g, "")
+      // Remove empty braces: {} → ""
+      .replace(/\{\s*\}/g, "")
+      // Normalize multiple spaces: "feat  : msg" → "feat : msg"
+      .replace(/\s+/g, " ")
+      // Remove space before colon: "feat : msg" → "feat: msg"
+      .replace(/\s+:/g, ":")
+      .trim()
+  );
+}
+
 export function renderTemplate(
   template: string,
   context: TemplateContext,
@@ -39,13 +56,10 @@ export function renderTemplate(
 ): string {
   const parsed = parseTemplate(template);
 
-  const missing = parsed.variables.filter((v) => !(v in context));
-  if (missing.length > 0) {
-    throw new TemplateMissingVariableError(missing);
-  }
-
+  // Allow optional variables - if not in context, replace with empty string
+  // This enables environment to be optional
   let result = template.replace(/\{\{(\w+)\}\}/g, (_, varName) => {
-    return context[varName];
+    return context[varName] || "";
   });
 
   if (parsed.messagePlaceholder) {
@@ -54,6 +68,9 @@ export function renderTemplate(
     }
     result = result.replace(/<\w+>/, message);
   }
+
+  // Clean up empty patterns from optional variables
+  result = cleanupEmptyPatterns(result);
 
   return result;
 }

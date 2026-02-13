@@ -179,12 +179,11 @@ describe("resolveShortcodes", () => {
     );
   });
 
-  it("throws when env required but not provided", () => {
+  it("allows omitting environment when enabled (environment is optional)", () => {
     const typeOnlyShortcode = "f";
-    // Config expects both type and env, but only type provided
-    expect(() => resolveShortcodes(typeOnlyShortcode, fullConfig)).toThrow(
-      "No environment shortcode found"
-    );
+    // Config has environment enabled, but only type provided - should work
+    const result = resolveShortcodes(typeOnlyShortcode, fullConfig);
+    expect(result).toEqual({ type: "feat" }); // no environment in result
   });
 
   it("detects ambiguous shortcode", () => {

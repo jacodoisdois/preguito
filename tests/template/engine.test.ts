@@ -54,16 +54,14 @@ describe("renderTemplate", () => {
     expect(result).toBe("[PAYMENTS-42] fix(api): fix timeout");
   });
 
-  it("throws on missing variable", () => {
-    expect(() =>
-      renderTemplate("{{squad}}: <message>", {}, "msg")
-    ).toThrow("Missing template variable(s): squad");
+  it("replaces missing variables with empty string", () => {
+    const result = renderTemplate("{{squad}}: <message>", {}, "msg");
+    expect(result).toBe(": msg");
   });
 
-  it("throws listing all missing variables", () => {
-    expect(() =>
-      renderTemplate("{{a}} {{b}} {{c}}: <message>", { a: "x" }, "msg")
-    ).toThrow("Missing template variable(s): b, c");
+  it("replaces multiple missing variables with empty strings and normalizes spaces", () => {
+    const result = renderTemplate("{{a}} {{b}} {{c}}: <message>", { a: "x" }, "msg");
+    expect(result).toBe("x: msg"); // cleanup normalizes multiple spaces
   });
 
   it("throws on missing message when placeholder exists", () => {
@@ -78,6 +76,69 @@ describe("renderTemplate", () => {
       desc: "broken login",
     });
     expect(result).toBe("fix: broken login");
+  });
+
+  it("renders with all variables present including optional environment", () => {
+    const result = renderTemplate(
+      "{{type}}({{environment}}): <message>",
+      { type: "feat", environment: "prd" },
+      "add feature"
+    );
+    expect(result).toBe("feat(prd): add feature");
+  });
+
+  it("renders without optional environment variable and cleans up empty parentheses", () => {
+    const result = renderTemplate(
+      "{{type}}({{environment}}): <message>",
+      { type: "feat" },
+      "add feature"
+    );
+    expect(result).toBe("feat: add feature");
+  });
+
+  it("cleans up empty brackets from optional variables", () => {
+    const result = renderTemplate(
+      "[{{card_id}}] {{type}}({{environment}}): <message>",
+      { type: "feat" },
+      "add feature"
+    );
+    expect(result).toBe("feat: add feature");
+  });
+
+  it("cleans up multiple empty patterns from missing optional variables", () => {
+    const result = renderTemplate(
+      "[{{card_id}}] {{type}}({{environment}}) [{{scope}}]: <message>",
+      { card_id: "123", type: "feat" },
+      "add feature"
+    );
+    expect(result).toBe("[123] feat: add feature");
+  });
+
+  it("normalizes multiple spaces after cleanup", () => {
+    const result = renderTemplate(
+      "{{type}}  ({{environment}})  : <message>",
+      { type: "feat" },
+      "add feature"
+    );
+    expect(result).toBe("feat: add feature");
+  });
+
+  it("removes space before colon after cleanup", () => {
+    const result = renderTemplate(
+      "{{type}} ({{environment}}) : <message>",
+      { type: "fix" },
+      "bug fix"
+    );
+    expect(result).toBe("fix: bug fix");
+  });
+
+  it("handles complex template with card_id prefix and optional environment", () => {
+    const result = renderTemplate(
+      "[{{prefix}}-{{card_id}}] {{type}}({{environment}}): <message>",
+      { prefix: "TASK", card_id: "123", type: "feat" },
+      "refactor code"
+    );
+    expect(result).toBe("[TASK-123] feat: refactor code");
   });
 });
 

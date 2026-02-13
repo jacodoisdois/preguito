@@ -41,12 +41,13 @@ async function amendAndPush(useLease: boolean): Promise<void> {
     process.exit(1);
   }
 
-  console.log("→ Staging all changes...");
+  const stopStage = spinner("Staging all changes...");
   await gitOps.stageAll();
+  stopStage("✔ Staged.");
 
-  console.log("→ Amending last commit...");
+  const stopAmend = spinner("Amending last commit...");
   await gitOps.commitAmend();
-  console.log("✔ Amended.");
+  stopAmend("✔ Amended.");
 
   if (useLease) {
     const stop = spinner("Pushing (--force-with-lease)...");

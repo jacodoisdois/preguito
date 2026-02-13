@@ -1,6 +1,7 @@
 import { Command } from "commander";
 import * as gitOps from "../git/operations.js";
 import { PrequitoError } from "../utils/errors.js";
+import { spinner } from "../utils/spinner.js";
 
 export function registerSwitchCommand(program: Command): void {
   program
@@ -30,12 +31,17 @@ async function executeSwitch(
     process.exit(1);
   }
 
+  const message = opts.new
+    ? `Creating and switching to ${branch}...`
+    : `Switching to ${branch}...`;
+
+  const stop = spinner(message);
+
   if (opts.new) {
-    console.log(`→ Creating and switching to ${branch}...`);
     await gitOps.createBranch(branch);
   } else {
-    console.log(`→ Switching to ${branch}...`);
     await gitOps.checkout(branch);
   }
-  console.log(`✔ On branch ${branch}.`);
+
+  stop(`✔ On branch ${branch}.`);
 }

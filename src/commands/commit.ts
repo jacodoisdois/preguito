@@ -56,9 +56,9 @@ async function executeCommit(
     process.exit(1);
   }
 
-  console.log(`\u2192 Committing: ${commitMessage}`);
+  const stopCommit = spinner(`Committing: ${commitMessage}`);
   await gitOps.commit(commitMessage);
-  console.log("\u2714 Committed.");
+  stopCommit("\u2714 Committed.");
 
   if (opts.force) {
     const stop = spinner("Pushing (--force-with-lease)...");
