@@ -61,7 +61,17 @@ export async function stageAll(): Promise<void> {
 }
 
 export async function commit(message: string): Promise<string> {
-  const result = await git(["commit", "-m", message]);
+  // Split on double newline to separate title from body
+  const parts = message.split("\n\n");
+  const title = parts[0];
+  const body = parts.slice(1).join("\n\n"); // Rejoin if multiple sections
+
+  const args = ["commit", "-m", title];
+  if (body) {
+    args.push("-m", body); // Git uses second -m for body
+  }
+
+  const result = await git(args);
   return result.stdout;
 }
 

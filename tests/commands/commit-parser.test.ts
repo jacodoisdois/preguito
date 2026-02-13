@@ -199,3 +199,26 @@ describe("resolveShortcodes", () => {
     );
   });
 });
+
+describe("parsePositionalArgs with body flag", () => {
+  it("includes body when provided", () => {
+    const result = parsePositionalArgs(
+      ["1234", "fp", "my commit"],
+      fullConfig,
+      "This is the body\nWith multiple lines"
+    );
+    expect(result.context.card_id).toBe("1234");
+    expect(result.message).toBe("my commit");
+    expect(result.body).toBe("This is the body\nWith multiple lines");
+  });
+
+  it("body is undefined when not provided", () => {
+    const result = parsePositionalArgs(["1234", "fp", "msg"], fullConfig);
+    expect(result.body).toBeUndefined();
+  });
+
+  it("empty string body is preserved", () => {
+    const result = parsePositionalArgs(["1234", "fp", "msg"], fullConfig, "");
+    expect(result.body).toBe("");
+  });
+});

@@ -5,11 +5,13 @@ import { PrequitoError } from "../utils/errors.js";
 export interface ParsedCommitArgs {
   context: Record<string, string>;
   message: string;
+  body?: string;
 }
 
 export function parsePositionalArgs(
   args: string[],
-  config: PrequitoConfig
+  config: PrequitoConfig,
+  bodyFromFlag?: string
 ): ParsedCommitArgs {
   if (args.length === 0) {
     throw new PrequitoError(
@@ -47,7 +49,7 @@ export function parsePositionalArgs(
 
   const finalContext = mergeContext(config.defaults, context);
 
-  return { context: finalContext, message };
+  return { context: finalContext, message, body: bodyFromFlag };
 }
 
 export function resolveShortcodes(

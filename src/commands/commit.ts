@@ -16,6 +16,7 @@ export function registerCommitCommand(program: Command): void {
     .option("-f, --force", "Push with --force-with-lease after committing")
     .option("-d, --dry-run", "Show the generated message without executing")
     .option("-S, --no-stage", "Skip auto-staging (git add -A)")
+    .option("-b, --body <text>", "Commit body (optional, multi-line description)")
     .action(async (args: string[], opts: Record<string, unknown>) => {
       try {
         await executeCommit(args, opts);
@@ -29,7 +30,7 @@ export function registerCommitCommand(program: Command): void {
     });
 }
 
-async function executeCommit(
+export async function executeCommit(
   args: string[],
   opts: Record<string, unknown>
 ): Promise<void> {
@@ -39,8 +40,12 @@ async function executeCommit(
   }
 
   const config = await loadConfigOrDefault();
-  const { context, message } = parsePositionalArgs(args, config);
-  const commitMessage = renderTemplate(config.template, context, message);
+  const bodyText = typeof opts.body === "string" ? opts.body : undefined;
+  const { context, message, body } = parsePositionalArgs(args, config, bodyText);
+  const commitTitle = renderTemplate(config.template, context, message);
+
+  // Construct full commit message
+  const commitMessage = body ? `${commitTitle}\n\n${body}` : commitTitle;
 
   if (opts.dryRun) {
     console.log(commitMessage);
@@ -56,7 +61,8 @@ async function executeCommit(
     process.exit(1);
   }
 
-  const stopCommit = spinner(`Committing: ${commitMessage}`);
+  // Show only title in spinner (body may be long)
+  const stopCommit = spinner(`Committing: ${commitTitle}`);
   await gitOps.commit(commitMessage);
   stopCommit("\u2714 Committed.");
 
