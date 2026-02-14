@@ -1,7 +1,13 @@
 import { Command } from "commander";
 import * as gitOps from "../git/operations.js";
 import { PrequitoError } from "../utils/errors.js";
+import { requireGitRepo, withErrorHandling } from "../utils/command.js";
 import { spinner } from "../utils/spinner.js";
+
+interface FixupOptions {
+  push?: boolean;
+  force?: boolean;
+}
 
 export function registerFixupCommand(program: Command): void {
   program
@@ -9,35 +15,21 @@ export function registerFixupCommand(program: Command): void {
     .description("Fixup commit for <hash> (e.g. guito cf abc123 -f)")
     .option("-p, --push", "Push after creating the fixup commit")
     .option("-f, --force", "Push with --force-with-lease after creating")
-    .action(async (hash: string, opts: Record<string, unknown>) => {
-      try {
-        await executeFixup(hash, opts);
-      } catch (error) {
-        if (error instanceof PrequitoError) {
-          console.error(`✖ ${error.message}`);
-          process.exit(1);
-        }
-        throw error;
-      }
-    });
+    .action(withErrorHandling(executeFixup));
 }
 
 async function executeFixup(
   hash: string,
-  opts: Record<string, unknown>
+  opts: FixupOptions
 ): Promise<void> {
-  if (!(await gitOps.isGitRepo())) {
-    console.error("✖ Not inside a git repository.");
-    process.exit(1);
-  }
+  await requireGitRepo();
 
   const stopStage = spinner("Staging all changes...");
   await gitOps.stageAll();
   stopStage("✔ Staged.");
 
   if (!(await gitOps.hasStagedChanges())) {
-    console.error("✖ No staged changes to commit.");
-    process.exit(1);
+    throw new PrequitoError("No staged changes to commit.");
   }
 
   const stopCommit = spinner(`Creating fixup commit for ${hash}...`);

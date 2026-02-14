@@ -184,7 +184,9 @@ guito u 3                       # Undo last 3 commits
 guito sw main                   # Switch branch
 guito sw -n feature/login       # Create + switch
 guito st                        # Stash changes
+guito st -m "WIP login"         # Stash with message
 guito stp                       # Stash pop
+guito stl                       # List all stashes
 ```
 
 ### Rebase
@@ -200,6 +202,15 @@ guito re abc123                 # Edit rebase at commit
 ```bash
 guito p                         # Simple push (git push)
 guito pu                        # Push + set upstream
+```
+
+### Diff
+
+```bash
+guito d                         # Show all changes
+guito d -s                      # Show staged changes only
+guito d --stat                  # Show diffstat summary
+guito d -n                      # Show only changed file names
 ```
 
 ### Inspect
@@ -274,8 +285,10 @@ See [template-system.md](docs/template-system.md) for full syntax, resolution or
 | `guito re <hash>` | — | Edit rebase at commit |
 | `guito ri <count>` | — | Interactive rebase last N commits |
 | `guito sw <branch>` | `switch` | Switch/create branch (`-n` to create) |
-| `guito st` | — | Stash changes |
+| `guito st` | — | Stash changes (`-m` for message) |
 | `guito stp` | — | Pop latest stash |
+| `guito stl` | — | List all stashes |
+| `guito d` | `diff` | Show changes (`-s` staged, `--stat`, `-n` names) |
 | `guito s` | `status` | Short status |
 | `guito l [count]` | `log` | Compact log (default: 10) |
 | `guito f <keyword>` | `find` | Search commits by message |
@@ -324,6 +337,26 @@ guito pu                         # Push with upstream
 guito ri 5                       # Interactive rebase last 5 commits
 # or create fixup commits:
 guito cf abc123 -f               # Fixup + force push
+```
+
+### Review changes before committing
+
+```bash
+guito d                          # See all unstaged changes
+guito d -s                       # See what's staged
+guito d --stat                   # Quick summary of changed files
+guito c 42 f "add feature" -p   # Commit + push
+```
+
+### Stash work in progress
+
+```bash
+guito st -m "WIP: login page"    # Stash with a descriptive message
+guito sw hotfix/urgent-fix       # Switch to another branch
+# ... do urgent work ...
+guito sw -                        # Switch back
+guito stl                        # List stashes to find yours
+guito stp                        # Restore your WIP
 ```
 
 ---

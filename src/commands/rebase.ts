@@ -1,6 +1,6 @@
 import { Command } from "commander";
 import * as gitOps from "../git/operations.js";
-import { PrequitoError } from "../utils/errors.js";
+import { requireGitRepo, withErrorHandling, parseCount } from "../utils/command.js";
 import { spinner } from "../utils/spinner.js";
 
 export function registerRebaseCommands(program: Command): void {
@@ -10,56 +10,23 @@ export function registerRebaseCommands(program: Command): void {
     .description(
       "Rebase on <branch> (checkout, pull, rebase) (e.g. guito r main)"
     )
-    .action(async (branch: string) => {
-      try {
-        await quickRebase(branch);
-      } catch (error) {
-        if (error instanceof PrequitoError) {
-          console.error(`✖ ${error.message}`);
-          process.exit(1);
-        }
-        throw error;
-      }
-    });
+    .action(withErrorHandling(quickRebase));
 
   program
     .command("ri <count>")
     .description(
       "Interactive rebase last <count> commits (e.g. guito ri 3)"
     )
-    .action(async (count: string) => {
-      try {
-        await interactiveRebase(count);
-      } catch (error) {
-        if (error instanceof PrequitoError) {
-          console.error(`✖ ${error.message}`);
-          process.exit(1);
-        }
-        throw error;
-      }
-    });
+    .action(withErrorHandling(interactiveRebase));
 
   program
     .command("re <hash>")
     .description("Edit rebase at <hash> (e.g. guito re abc123)")
-    .action(async (hash: string) => {
-      try {
-        await editRebase(hash);
-      } catch (error) {
-        if (error instanceof PrequitoError) {
-          console.error(`✖ ${error.message}`);
-          process.exit(1);
-        }
-        throw error;
-      }
-    });
+    .action(withErrorHandling(editRebase));
 }
 
 async function quickRebase(branch: string): Promise<void> {
-  if (!(await gitOps.isGitRepo())) {
-    console.error("✖ Not inside a git repository.");
-    process.exit(1);
-  }
+  await requireGitRepo();
 
   const currentBranch = await gitOps.getCurrentBranch();
   console.log(`→ Current branch: ${currentBranch}`);
@@ -82,26 +49,15 @@ async function quickRebase(branch: string): Promise<void> {
 }
 
 async function interactiveRebase(count: string): Promise<void> {
-  if (!(await gitOps.isGitRepo())) {
-    console.error("✖ Not inside a git repository.");
-    process.exit(1);
-  }
+  await requireGitRepo();
 
-  const num = parseInt(count, 10);
-  if (isNaN(num) || num <= 0) {
-    console.error("✖ Count must be a positive integer.");
-    process.exit(1);
-  }
-
+  const num = parseCount(count);
   console.log(`→ Starting interactive rebase for the last ${num} commit(s)...`);
   await gitOps.rebaseInteractive(num);
 }
 
 async function editRebase(hash: string): Promise<void> {
-  if (!(await gitOps.isGitRepo())) {
-    console.error("✖ Not inside a git repository.");
-    process.exit(1);
-  }
+  await requireGitRepo();
 
   console.log(`→ Starting edit rebase on commit ${hash}...`);
   await gitOps.rebaseInteractiveEdit(hash);

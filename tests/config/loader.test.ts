@@ -2,7 +2,6 @@ import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { mkdtemp, writeFile, rm } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
-import { existsSync } from "node:fs";
 
 // We test loadConfig indirectly by creating temp config files
 // and calling the validation logic via the module

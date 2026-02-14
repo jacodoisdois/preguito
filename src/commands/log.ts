@@ -1,41 +1,23 @@
 import { Command } from "commander";
 import * as gitOps from "../git/operations.js";
-import { PrequitoError } from "../utils/errors.js";
+import { requireGitRepo, withErrorHandling, parseCount } from "../utils/command.js";
 
 export function registerLogCommand(program: Command): void {
   program
     .command("l [count]")
     .alias("log")
     .description("Compact log, default last 10 (e.g. guito l 20)")
-    .action(async (count?: string) => {
-      try {
-        await executeLog(count);
-      } catch (error) {
-        if (error instanceof PrequitoError) {
-          console.error(`✖ ${error.message}`);
-          process.exit(1);
+    .action(
+      withErrorHandling(async (count?: string) => {
+        await requireGitRepo();
+
+        const num = parseCount(count, 10);
+        const output = await gitOps.logOneline(num);
+        if (output) {
+          console.log(output.trimEnd());
+        } else {
+          console.log("✨ No commits found.");
         }
-        throw error;
-      }
-    });
-}
-
-async function executeLog(count?: string): Promise<void> {
-  if (!(await gitOps.isGitRepo())) {
-    console.error("✖ Not inside a git repository.");
-    process.exit(1);
-  }
-
-  const num = count ? parseInt(count, 10) : 10;
-  if (isNaN(num) || num <= 0) {
-    console.error("✖ Count must be a positive integer.");
-    process.exit(1);
-  }
-
-  const output = await gitOps.logOneline(num);
-  if (output) {
-    console.log(output.trimEnd());
-  } else {
-    console.log("✨ No commits found.");
-  }
+      })
+    );
 }

@@ -14,6 +14,7 @@ import { registerSwitchCommand } from "./commands/switch.js";
 import { registerStashCommands } from "./commands/stash.js";
 import { registerLogCommand } from "./commands/log.js";
 import { registerFindCommands } from "./commands/find.js";
+import { registerDiffCommand } from "./commands/diff.js";
 
 const program = new Command();
 
@@ -39,5 +40,6 @@ registerSwitchCommand(program);
 registerStashCommands(program);
 registerLogCommand(program);
 registerFindCommands(program);
+registerDiffCommand(program);
 
 program.parse();

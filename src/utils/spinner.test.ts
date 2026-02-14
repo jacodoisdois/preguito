@@ -7,7 +7,7 @@ describe("spinner", () => {
   beforeEach(() => {
     vi.useFakeTimers();
     vi.spyOn(process.stdout, "write").mockImplementation(() => true);
-    vi.spyOn(console, "log").mockImplementation(() => {});
+    vi.spyOn(console, "log").mockImplementation(() => { });
     originalIsTTY = process.stdout.isTTY;
     // Default to TTY mode for most tests
     Object.defineProperty(process.stdout, "isTTY", {
@@ -59,8 +59,8 @@ describe("spinner", () => {
       const calls = (process.stdout.write as ReturnType<typeof vi.fn>).mock
         .calls;
       const afterStopCalls = calls.filter(
-        ([text]: [string]) =>
-          text !== "\r\x1b[K⠋ Pushing..." && text !== "\r\x1b[K✔ Done.\n"
+        (call) =>
+          call[0] !== "\r\x1b[K⠋ Pushing..." && call[0] !== "\r\x1b[K✔ Done.\n"
       );
       expect(afterStopCalls).toHaveLength(0);
     });
@@ -79,7 +79,7 @@ describe("spinner", () => {
       spinner("Running...");
 
       // Trigger SIGINT
-      process.emit("SIGINT" as any);
+      process.emit("SIGINT" as NodeJS.Signals);
 
       // Should clear the line
       expect(process.stdout.write).toHaveBeenCalledWith("\r\x1b[K");
@@ -89,7 +89,7 @@ describe("spinner", () => {
       spinner("Running...");
 
       // Trigger SIGTERM
-      process.emit("SIGTERM" as any);
+      process.emit("SIGTERM" as NodeJS.Signals);
 
       // Should clear the line
       expect(process.stdout.write).toHaveBeenCalledWith("\r\x1b[K");

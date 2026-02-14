@@ -14,7 +14,7 @@
     "dev": "tsdown --watch",
     "test": "vitest run",
     "test:watch": "vitest",
-    "lint": "tsc --noEmit",
+    "lint": "tsc --noEmit && eslint src/ tests/",
     "prepublishOnly": "npm run build",
     "build:sea": "npm run build && node scripts/build-sea.js",
     "build:deb": "npm run build:sea && bash scripts/build-deb.sh"
@@ -31,10 +31,13 @@
     "commander": "^13.0.0"
   },
   "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.55.0",
+    "@typescript-eslint/parser": "^8.55.0",
+    "eslint": "^9.39.2",
     "tsdown": "^0.20.0",
     "typescript": "^5.7.0",
-    "vitest": "^3.0.0",
-    "@types/node": "^22.0.0"
+    "vitest": "^3.0.0"
   },
   "engines": {
     "node": ">=20.0.0"

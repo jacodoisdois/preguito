@@ -1,5 +1,4 @@
 import {
-  TemplateMissingVariableError,
   TemplateMissingMessageError,
 } from "../utils/errors.js";
 
