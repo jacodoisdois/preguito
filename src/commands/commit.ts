@@ -29,6 +29,7 @@ interface CommitOptions {
   force?: boolean;
   dryRun?: boolean;
   stage?: boolean;
+  body?: string;
 }
 
 export async function executeCommit(
