@@ -1,7 +1,8 @@
 import { PrequitoError } from "./errors.js";
 
 const GIT_HASH_PATTERN = /^[a-f0-9]{4,40}$/i;
-const GIT_REF_FORBIDDEN_CHARS = /[\x00-\x1f\x7f ~^:?*\[\\]/;
+// eslint-disable-next-line no-control-regex
+const GIT_REF_FORBIDDEN_CHARS = /[\x00-\x1f\x7f ~^:?*[\\]/;
 const GIT_REF_FORBIDDEN_SEQUENCES = /\.\.|\.lock(\/|$)|@\{|\/\//;
 
 export function validateHash(hash: string): void {

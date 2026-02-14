@@ -79,7 +79,7 @@ describe("spinner", () => {
       spinner("Running...");
 
       // Trigger SIGINT
-      process.emit("SIGINT" as any);
+      process.emit("SIGINT" as NodeJS.Signals);
 
       // Should clear the line
       expect(process.stdout.write).toHaveBeenCalledWith("\r\x1b[K");
@@ -89,7 +89,7 @@ describe("spinner", () => {
       spinner("Running...");
 
       // Trigger SIGTERM
-      process.emit("SIGTERM" as any);
+      process.emit("SIGTERM" as NodeJS.Signals);
 
       // Should clear the line
       expect(process.stdout.write).toHaveBeenCalledWith("\r\x1b[K");
