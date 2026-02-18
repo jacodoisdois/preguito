@@ -1,5 +1,7 @@
 # 🦥 preguito
 
+> 🌐 **[Landing Page](https://jacodoisdois.github.io/preguito)** | 📦 **[npm](https://www.npmjs.com/package/preguito)** | 📚 **[Docs](./docs/)**
+
 > A lazy git CLI with commit templates and shortcuts.
 
 Typing the same commit prefix, squad name, and ticket number over and over is tedious. preguito lets you define a commit template once and reuse it on every commit — single-letter shortcodes replace verbose flags, so you only type what matters.

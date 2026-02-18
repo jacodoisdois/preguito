@@ -1,0 +1,120 @@
+---
+// Quick Start - 3 steps
+const steps = [
+  {
+    number: '1',
+    title: 'Install',
+    description: 'npm install -g preguito',
+    icon: '📦',
+  },
+  {
+    number: '2',
+    title: 'Configure',
+    description: 'guito init (interactive wizard)',
+    icon: '⚙️',
+  },
+  {
+    number: '3',
+    title: 'Use',
+    description: 'guito c 123 f "your message"',
+    icon: '🚀',
+  },
+];
+---
+
+<section class="quickstart section">
+  <div class="container">
+    <h2 class="text-center">Your first commit</h2>
+    <p class="quickstart-subtitle text-center">
+      Three simple steps to start being lazy
+    </p>
+
+    <div class="steps-grid">
+      {steps.map((step) => (
+        <div class="step-card">
+          <div class="step-number">{step.number}</div>
+          <div class="step-icon">{step.icon}</div>
+          <h3 class="step-title">{step.title}</h3>
+          <p class="step-description"><code>{step.description}</code></p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .quickstart {
+    background-color: var(--bg-primary);
+  }
+
+  .quickstart-subtitle {
+    color: var(--text-secondary);
+    margin: 0 auto var(--space-6);
+    max-width: 500px;
+  }
+
+  .steps-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: var(--space-5);
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .step-card {
+    background-color: var(--bg-secondary);
+    border-radius: var(--radius-lg);
+    padding: var(--space-5);
+    text-align: center;
+    position: relative;
+    transition: transform var(--transition-base);
+  }
+
+  .step-card:hover {
+    transform: translateY(-8px);
+  }
+
+  .step-number {
+    position: absolute;
+    top: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 40px;
+    background-color: var(--accent);
+    color: var(--bg-primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: var(--text-xl);
+  }
+
+  .step-icon {
+    font-size: var(--text-5xl);
+    margin: var(--space-3) 0;
+  }
+
+  .step-title {
+    font-size: var(--text-2xl);
+    margin-bottom: var(--space-2);
+    color: var(--text-primary);
+  }
+
+  .step-description {
+    color: var(--text-secondary);
+    margin: 0;
+  }
+
+  .step-description code {
+    font-size: var(--text-sm);
+  }
+
+  @media (max-width: 768px) {
+    .steps-grid {
+      grid-template-columns: 1fr;
+      gap: var(--space-4);
+    }
+  }
+</style>

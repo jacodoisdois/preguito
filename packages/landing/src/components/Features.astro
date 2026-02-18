@@ -1,0 +1,117 @@
+---
+// Features Grid - 4 cards
+const features = [
+  {
+    icon: '📝',
+    title: 'Customizable Templates',
+    description: 'Configure once, use forever. Jira, Linear, or any commit pattern you need.',
+  },
+  {
+    icon: '⚡',
+    title: 'Short Commands',
+    description: 'guito c = commit, guito ap = amend + push. 70% less typing, same results.',
+  },
+  {
+    icon: '🎯',
+    title: 'Zero Config',
+    description: 'Sensible defaults out-of-the-box. Start using it immediately without setup.',
+  },
+  {
+    icon: '🔧',
+    title: 'Highly Configurable',
+    description: 'Per-project or global settings. TypeScript API for advanced automation.',
+  },
+];
+---
+
+<section class="features section" id="features">
+  <div class="container">
+    <h2 class="features-title text-center">More productive, less tedious</h2>
+    <p class="features-subtitle text-center">
+      Stop wasting time on repetitive Git commands. Let preguito handle the boring stuff.
+    </p>
+
+    <div class="features-grid grid grid-4">
+      {features.map((feature) => (
+        <div class="feature-card card">
+          <div class="feature-icon">{feature.icon}</div>
+          <h3 class="feature-title">{feature.title}</h3>
+          <p class="feature-description">{feature.description}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .features {
+    background-color: var(--bg-primary);
+  }
+
+  .features-title {
+    font-size: var(--text-4xl);
+    margin-bottom: var(--space-3);
+  }
+
+  .features-subtitle {
+    font-size: var(--text-lg);
+    color: var(--text-secondary);
+    margin: 0 auto var(--space-6);
+    max-width: 600px;
+  }
+
+  .features-grid {
+    margin-top: var(--space-6);
+  }
+
+  .feature-card {
+    text-align: center;
+    padding: var(--space-5);
+  }
+
+  .feature-icon {
+    font-size: var(--text-5xl);
+    margin-bottom: var(--space-3);
+    display: inline-block;
+    animation: bounce 2s ease-in-out infinite;
+  }
+
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+
+  .feature-card:nth-child(1) .feature-icon { animation-delay: 0s; }
+  .feature-card:nth-child(2) .feature-icon { animation-delay: 0.2s; }
+  .feature-card:nth-child(3) .feature-icon { animation-delay: 0.4s; }
+  .feature-card:nth-child(4) .feature-icon { animation-delay: 0.6s; }
+
+  .feature-title {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    margin-bottom: var(--space-2);
+    color: var(--text-primary);
+  }
+
+  .feature-description {
+    font-size: var(--text-base);
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  @media (max-width: 768px) {
+    .features-title {
+      font-size: var(--text-3xl);
+    }
+
+    .features-grid {
+      grid-template-columns: 1fr;
+      gap: var(--space-3);
+    }
+
+    .feature-card {
+      padding: var(--space-4);
+    }
+  }
+</style>

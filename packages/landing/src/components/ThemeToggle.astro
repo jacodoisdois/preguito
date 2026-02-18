@@ -1,0 +1,93 @@
+---
+// Theme Toggle Component
+---
+
+<button
+  id="theme-toggle"
+  class="theme-toggle"
+  aria-label="Toggle theme"
+  title="Toggle dark/light mode"
+>
+  <span class="theme-icon theme-icon-light">☀️</span>
+  <span class="theme-icon theme-icon-dark">🌙</span>
+</button>
+
+<style>
+  .theme-toggle {
+    position: fixed;
+    top: var(--space-3);
+    right: var(--space-3);
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    background-color: var(--bg-secondary);
+    border: 2px solid var(--border-color);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-base);
+    z-index: 100;
+    font-size: 1.5rem;
+  }
+
+  .theme-toggle:hover {
+    transform: scale(1.1);
+    box-shadow: var(--shadow-md);
+  }
+
+  .theme-toggle:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  .theme-icon {
+    position: absolute;
+    transition: opacity var(--transition-fast), transform var(--transition-fast);
+  }
+
+  /* Show sun in dark mode, moon in light mode */
+  :root[data-theme='light'] .theme-icon-light {
+    opacity: 0;
+    transform: rotate(90deg);
+  }
+
+  :root[data-theme='light'] .theme-icon-dark {
+    opacity: 1;
+    transform: rotate(0deg);
+  }
+
+  :root[data-theme='dark'] .theme-icon-light {
+    opacity: 1;
+    transform: rotate(0deg);
+  }
+
+  :root[data-theme='dark'] .theme-icon-dark {
+    opacity: 0;
+    transform: rotate(-90deg);
+  }
+
+  @media (max-width: 768px) {
+    .theme-toggle {
+      top: var(--space-2);
+      right: var(--space-2);
+      width: 2.5rem;
+      height: 2.5rem;
+      font-size: 1.25rem;
+    }
+  }
+</style>
+
+<script>
+  const toggleButton = document.getElementById('theme-toggle');
+
+  if (toggleButton) {
+    toggleButton.addEventListener('click', () => {
+      const currentTheme = document.documentElement.dataset.theme;
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+
+      document.documentElement.dataset.theme = newTheme;
+      localStorage.setItem('theme', newTheme);
+    });
+  }
+</script>

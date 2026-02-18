@@ -1,0 +1,204 @@
+---
+// Hero Section with Before/After Demo
+---
+
+<section class="hero">
+  <div class="container">
+    <div class="hero-content">
+      <h1 class="hero-title">
+        Git, but lazier <span class="sloth">🦥</span>
+      </h1>
+      <p class="hero-subtitle">
+        Commit templates + short commands = less typing, more coding
+      </p>
+
+      <div class="hero-ctas">
+        <button class="btn btn-primary" onclick="document.getElementById('installation').scrollIntoView({ behavior: 'smooth' })">
+          Install now
+        </button>
+        <button class="btn btn-secondary" onclick="document.getElementById('docs').scrollIntoView({ behavior: 'smooth' })">
+          Read the docs
+        </button>
+      </div>
+    </div>
+
+    <div class="hero-demo">
+      <div class="demo-comparison">
+        <div class="demo-block demo-before">
+          <div class="demo-label">Before (Traditional Git)</div>
+          <pre><code class="language-bash">$ git add src/auth.ts tests/auth.test.ts
+$ git commit -m "[TASK-456] feat(auth): add OAuth2 support"
+$ git push</code></pre>
+        </div>
+
+        <div class="demo-arrow">→</div>
+
+        <div class="demo-block demo-after">
+          <div class="demo-label">After (With preguito)</div>
+          <pre><code class="language-bash">$ guito c 456 f "add OAuth2 support" -p</code></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    padding: var(--space-8) 0;
+    background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+  }
+
+  .hero-content {
+    text-align: center;
+    margin-bottom: var(--space-6);
+  }
+
+  .hero-title {
+    font-size: var(--text-6xl);
+    font-weight: 700;
+    margin-bottom: var(--space-3);
+    background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .sloth {
+    display: inline-block;
+    animation: sway 3s ease-in-out infinite;
+  }
+
+  @keyframes sway {
+    0%, 100% { transform: rotate(-5deg); }
+    50% { transform: rotate(5deg); }
+  }
+
+  .hero-subtitle {
+    font-size: var(--text-xl);
+    color: var(--text-secondary);
+    margin: 0 auto var(--space-5);
+    max-width: 600px;
+  }
+
+  .hero-ctas {
+    display: flex;
+    gap: var(--space-3);
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .hero-demo {
+    margin-top: var(--space-6);
+  }
+
+  .demo-comparison {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: var(--space-4);
+    align-items: center;
+  }
+
+  .demo-block {
+    background-color: var(--bg-secondary);
+    border-radius: var(--radius-lg);
+    padding: var(--space-4);
+    box-shadow: var(--shadow-md);
+    transition: transform var(--transition-base);
+  }
+
+  .demo-block:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .demo-label {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: var(--space-2);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .demo-before .demo-label {
+    color: #E07856;
+  }
+
+  .demo-after .demo-label {
+    color: var(--accent);
+  }
+
+  .demo-block pre {
+    margin: 0;
+    padding: var(--space-3);
+    background-color: var(--bg-primary);
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    line-height: 1.8;
+  }
+
+  .demo-block code {
+    color: var(--text-primary);
+    background: transparent;
+    padding: 0;
+  }
+
+  .demo-arrow {
+    font-size: var(--text-4xl);
+    color: var(--accent);
+    font-weight: bold;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+  }
+
+  /* Responsive */
+  @media (max-width: 1024px) {
+    .demo-comparison {
+      grid-template-columns: 1fr;
+      gap: var(--space-3);
+    }
+
+    .demo-arrow {
+      transform: rotate(90deg);
+      margin: var(--space-2) 0;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .hero {
+      padding: var(--space-6) 0;
+      min-height: auto;
+    }
+
+    .hero-title {
+      font-size: var(--text-4xl);
+    }
+
+    .hero-subtitle {
+      font-size: var(--text-lg);
+    }
+
+    .demo-block pre {
+      font-size: var(--text-xs);
+      padding: var(--space-2);
+    }
+  }
+
+  @media (max-width: 480px) {
+    .hero-ctas {
+      flex-direction: column;
+      width: 100%;
+    }
+
+    .hero-ctas .btn {
+      width: 100%;
+    }
+  }
+</style>

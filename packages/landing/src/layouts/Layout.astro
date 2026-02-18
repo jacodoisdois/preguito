@@ -1,0 +1,89 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = 'preguito - Git, but lazier 🦥',
+  description = 'Commit templates + short commands = less typing, more coding. A lazy git CLI tool with customizable templates and shortcuts.',
+} = Astro.props;
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/preguito/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+
+    <!-- Primary Meta Tags -->
+    <title>{title}</title>
+    <meta name="title" content={title} />
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalURL} />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:site_name" content="preguito" />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content={canonicalURL} />
+    <meta property="twitter:title" content={title} />
+    <meta property="twitter:description" content={description} />
+
+    <!-- Theme Color -->
+    <meta name="theme-color" content="#8BA888" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#9DBF9E" media="(prefers-color-scheme: dark)" />
+
+    <!-- Fonts (Inter for headings) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <slot />
+
+    <!-- Theme Toggle Script (must run before content loads) -->
+    <script is:inline>
+      // Load saved theme or detect system preference
+      const getSavedTheme = () => {
+        if (typeof localStorage !== 'undefined') {
+          return localStorage.getItem('theme');
+        }
+        return null;
+      };
+
+      const getPreferredTheme = () => {
+        const savedTheme = getSavedTheme();
+        if (savedTheme) {
+          return savedTheme;
+        }
+        // Default to dark theme
+        return 'dark';
+      };
+
+      // Apply theme immediately (before content paints)
+      document.documentElement.dataset.theme = getPreferredTheme();
+
+      // Listen for theme changes
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+        if (!getSavedTheme()) {
+          document.documentElement.dataset.theme = e.matches ? 'dark' : 'light';
+        }
+      });
+    </script>
+  </body>
+</html>

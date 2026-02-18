@@ -8,3 +8,8 @@ build/
 sea-prep.blob
 preguito-sea
 .claude
+
+# Landing page artifacts
+packages/landing/dist/
+packages/landing/.astro/
+packages/landing/node_modules/

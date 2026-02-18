@@ -1,0 +1,25 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ThemeToggle from '../components/ThemeToggle.astro';
+import Hero from '../components/Hero.astro';
+import Features from '../components/Features.astro';
+import Installation from '../components/Installation.astro';
+import Documentation from '../components/Documentation.astro';
+import QuickStart from '../components/QuickStart.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<Layout
+  title="preguito - Git, but lazier 🦥"
+  description="Commit templates + short commands = less typing, more coding. A lazy git CLI tool with customizable templates and shortcuts."
+>
+  <ThemeToggle />
+  <main>
+    <Hero />
+    <Features />
+    <Installation />
+    <Documentation />
+    <QuickStart />
+  </main>
+  <Footer />
+</Layout>

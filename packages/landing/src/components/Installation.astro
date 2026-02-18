@@ -1,0 +1,196 @@
+---
+// Installation Section with Tabs
+---
+
+<section class="installation section" id="installation">
+  <div class="container">
+    <h2 class="text-center">Get started in 10 seconds</h2>
+    <p class="installation-subtitle text-center">
+      Choose your preferred installation method
+    </p>
+
+    <div class="installation-tabs">
+      <div class="tab-buttons">
+        <button class="tab-button active" data-tab="npm">npm</button>
+        <button class="tab-button" data-tab="deb">deb</button>
+        <button class="tab-button" data-tab="binary">Binary</button>
+      </div>
+
+      <div class="tab-content">
+        <div class="tab-pane active" id="npm">
+          <p class="tab-description">Recommended for Node.js users</p>
+          <div class="code-block">
+            <pre><code>npm install -g preguito</code></pre>
+            <button class="copy-btn" data-copy="npm install -g preguito">Copy</button>
+          </div>
+        </div>
+
+        <div class="tab-pane" id="deb">
+          <p class="tab-description">For Debian/Ubuntu systems</p>
+          <div class="code-block">
+            <pre><code>wget https://github.com/jacodoisdois/preguito/releases/latest/download/preguito_0.2.1_amd64.deb
+sudo dpkg -i preguito_0.2.1_amd64.deb</code></pre>
+            <button class="copy-btn" data-copy="wget https://github.com/jacodoisdois/preguito/releases/latest/download/preguito_0.2.1_amd64.deb&#10;sudo dpkg -i preguito_0.2.1_amd64.deb">Copy</button>
+          </div>
+          <a href="https://github.com/jacodoisdois/preguito/releases" target="_blank" rel="noopener noreferrer" class="btn btn-secondary mt-3">
+            View all releases →
+          </a>
+        </div>
+
+        <div class="tab-pane" id="binary">
+          <p class="tab-description">Standalone binary (no Node.js required)</p>
+          <div class="code-block">
+            <pre><code>wget https://github.com/jacodoisdois/preguito/releases/latest/download/guito
+chmod +x guito
+sudo mv guito /usr/local/bin/</code></pre>
+            <button class="copy-btn" data-copy="wget https://github.com/jacodoisdois/preguito/releases/latest/download/guito&#10;chmod +x guito&#10;sudo mv guito /usr/local/bin/">Copy</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .installation {
+    background-color: var(--bg-secondary);
+  }
+
+  .installation-subtitle {
+    color: var(--text-secondary);
+    margin: 0 auto var(--space-6);
+    max-width: 500px;
+  }
+
+  .installation-tabs {
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  .tab-buttons {
+    display: flex;
+    gap: var(--space-2);
+    margin-bottom: var(--space-4);
+    justify-content: center;
+  }
+
+  .tab-button {
+    padding: var(--space-2) var(--space-4);
+    background-color: var(--bg-primary);
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-md);
+    color: var(--text-secondary);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+  }
+
+  .tab-button:hover,
+  .tab-button.active {
+    background-color: var(--accent);
+    color: var(--bg-primary);
+    border-color: var(--accent);
+  }
+
+  .tab-pane {
+    display: none;
+  }
+
+  .tab-pane.active {
+    display: block;
+  }
+
+  .tab-description {
+    text-align: center;
+    color: var(--text-secondary);
+    margin-bottom: var(--space-3);
+  }
+
+  .code-block {
+    position: relative;
+    background-color: var(--bg-primary);
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
+  }
+
+  .code-block pre {
+    margin: 0;
+    overflow-x: auto;
+  }
+
+  .copy-btn {
+    position: absolute;
+    top: var(--space-2);
+    right: var(--space-2);
+    padding: var(--space-1) var(--space-2);
+    background-color: var(--accent);
+    color: var(--bg-primary);
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+  }
+
+  .copy-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .copy-btn.copied {
+    background-color: #4CAF50;
+  }
+
+  @media (max-width: 768px) {
+    .tab-buttons {
+      flex-wrap: wrap;
+    }
+
+    .tab-button {
+      flex: 1;
+      min-width: 80px;
+    }
+  }
+</style>
+
+<script>
+  const tabButtons = document.querySelectorAll('.tab-button');
+  const tabPanes = document.querySelectorAll('.tab-pane');
+
+  tabButtons.forEach((button) => {
+    button.addEventListener('click', () => {
+      const tabName = button.dataset.tab;
+
+      // Remove active from all
+      tabButtons.forEach((btn) => btn.classList.remove('active'));
+      tabPanes.forEach((pane) => pane.classList.remove('active'));
+
+      // Add active to selected
+      button.classList.add('active');
+      document.getElementById(tabName).classList.add('active');
+    });
+  });
+
+  // Copy to clipboard
+  const copyButtons = document.querySelectorAll('.copy-btn');
+
+  copyButtons.forEach((button) => {
+    button.addEventListener('click', async () => {
+      const text = button.dataset.copy;
+
+      try {
+        await navigator.clipboard.writeText(text);
+        button.textContent = 'Copied!';
+        button.classList.add('copied');
+
+        setTimeout(() => {
+          button.textContent = 'Copy';
+          button.classList.remove('copied');
+        }, 2000);
+      } catch (err) {
+        console.error('Failed to copy:', err);
+      }
+    });
+  });
+</script>

@@ -1,0 +1,546 @@
+---
+// Documentation Component - Complete Command Reference
+const commands = [
+  { cmd: 'guito c [id] [codes] "msg"', alias: 'commit', desc: 'Templated commit with auto-stage' },
+  { cmd: 'guito cf <hash>', alias: '—', desc: 'Create a fixup commit' },
+  { cmd: 'guito ap', alias: '—', desc: 'Amend + force push' },
+  { cmd: 'guito apl', alias: '—', desc: 'Amend + force push with lease' },
+  { cmd: 'guito u [count]', alias: 'undo', desc: 'Undo last N commits (soft reset)' },
+  { cmd: 'guito p', alias: 'push', desc: 'Simple push (git push)' },
+  { cmd: 'guito pu', alias: '—', desc: 'Push with --set-upstream' },
+  { cmd: 'guito r <branch>', alias: 'rebase', desc: 'Quick rebase on branch' },
+  { cmd: 'guito re <hash>', alias: '—', desc: 'Edit rebase at commit' },
+  { cmd: 'guito ri <count>', alias: '—', desc: 'Interactive rebase last N commits' },
+  { cmd: 'guito sw <branch>', alias: 'switch', desc: 'Switch/create branch (-n to create)' },
+  { cmd: 'guito st', alias: '—', desc: 'Stash changes' },
+  { cmd: 'guito stp', alias: '—', desc: 'Pop latest stash' },
+  { cmd: 'guito s', alias: 'status', desc: 'Short status' },
+  { cmd: 'guito l [count]', alias: 'log', desc: 'Compact log (default: 10)' },
+  { cmd: 'guito f <keyword>', alias: 'find', desc: 'Search commits by message' },
+  { cmd: 'guito t <tag>', alias: 'tag', desc: 'Commits since/from a tag' },
+  { cmd: 'guito i', alias: 'init', desc: 'Setup wizard' },
+  { cmd: 'guito cfg', alias: 'config', desc: 'View configuration' },
+];
+
+const types = [
+  { key: 'f', label: 'feat' },
+  { key: 'x', label: 'fix' },
+  { key: 'c', label: 'chore' },
+  { key: 't', label: 'test' },
+  { key: 'r', label: 'refactor' },
+  { key: 'd', label: 'docs' },
+];
+
+const environments = [
+  { key: 'p', label: 'prd' },
+  { key: 'u', label: 'uat' },
+  { key: 'd', label: 'dev' },
+  { key: 's', label: 'stg' },
+  { key: 'l', label: 'local' },
+];
+
+const workflows = [
+  {
+    title: 'Start a new feature',
+    code: `guito sw -n feature/login       # Create branch
+# ... make changes ...
+guito c 42 f "add login" -p     # Commit + push`,
+  },
+  {
+    title: 'Quick fix on current branch',
+    code: `# ... fix the bug ...
+guito c 99 x "fix timeout" -p   # x = fix, push immediately`,
+  },
+  {
+    title: 'Amend last commit',
+    code: `# ... make more changes ...
+guito apl                        # Amend + force push (safe)`,
+  },
+  {
+    title: 'Rebase before PR',
+    code: `guito r main                     # Pull main, rebase on top
+guito pu                         # Push with upstream`,
+  },
+  {
+    title: 'Clean up commit history',
+    code: `guito ri 5                       # Interactive rebase last 5 commits
+# or create fixup commits:
+guito cf abc123 -f               # Fixup + force push`,
+  },
+];
+
+const configExamples = [
+  {
+    title: 'Minimal Setup',
+    desc: 'Simple template with types only',
+    code: `{
+  "template": "{{type}}: <message>",
+  "features": {
+    "cardId": false,
+    "type": true,
+    "environment": false
+  },
+  "types": [
+    { "key": "f", "label": "feat" },
+    { "key": "x", "label": "fix" },
+    { "key": "c", "label": "chore" }
+  ]
+}`,
+  },
+  {
+    title: 'Team Setup (Jira)',
+    desc: 'Full template with Jira ticket prefix',
+    code: `{
+  "template": "[PAYMENTS-{{card_id}}] {{type}}({{environment}}): <message>",
+  "features": {
+    "cardId": true,
+    "type": true,
+    "environment": true
+  },
+  "types": [
+    { "key": "f", "label": "feat" },
+    { "key": "x", "label": "fix" }
+  ],
+  "environments": [
+    { "key": "p", "label": "prd" },
+    { "key": "u", "label": "uat" }
+  ],
+  "defaults": {
+    "prefix": "PAYMENTS"
+  }
+}`,
+  },
+  {
+    title: 'Advanced Setup',
+    desc: 'Optional environment variables',
+    code: `{
+  "template": "[{{prefix}}-{{card_id}}] {{type}}{{environment}}: <message>",
+  "features": {
+    "cardId": true,
+    "type": true,
+    "environment": true
+  },
+  "types": [
+    { "key": "f", "label": "feat" },
+    { "key": "x", "label": "fix" },
+    { "key": "c", "label": "chore" },
+    { "key": "t", "label": "test" },
+    { "key": "r", "label": "refactor" },
+    { "key": "d", "label": "docs" }
+  ],
+  "environments": [
+    { "key": "p", "label": "(prd)" },
+    { "key": "u", "label": "(uat)" },
+    { "key": "d", "label": "(dev)" }
+  ],
+  "defaults": {
+    "prefix": "CHECKOUT"
+  }
+}`,
+  },
+];
+---
+
+<section class="documentation section" id="docs">
+  <div class="container">
+    <h2 class="text-center">Documentation</h2>
+    <p class="docs-intro">
+      Complete command reference and usage examples. No GitHub required.
+    </p>
+
+    <div class="docs-tabs">
+      <button class="tab-button active" data-tab="commands">Commands</button>
+      <button class="tab-button" data-tab="shortcodes">Shortcodes</button>
+      <button class="tab-button" data-tab="workflows">Workflows</button>
+      <button class="tab-button" data-tab="config">Config</button>
+    </div>
+
+    <div class="docs-content">
+      <!-- Tab 1: Commands -->
+      <div class="tab-pane active" id="commands">
+        <h3>Command Reference</h3>
+        <div class="table-wrapper">
+          <table class="command-table">
+            <thead>
+              <tr>
+                <th>Command</th>
+                <th>Alias</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              {commands.map((cmd) => (
+                <tr>
+                  <td><code>{cmd.cmd}</code></td>
+                  <td>{cmd.alias}</td>
+                  <td>{cmd.desc}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Tab 2: Shortcodes -->
+      <div class="tab-pane" id="shortcodes">
+        <h3>Shortcodes Reference</h3>
+        <div class="shortcodes-grid">
+          <div class="shortcode-section">
+            <h4>Types</h4>
+            <table class="shortcode-table">
+              <thead>
+                <tr>
+                  <th>Key</th>
+                  <th>Label</th>
+                </tr>
+              </thead>
+              <tbody>
+                {types.map((type) => (
+                  <tr>
+                    <td><code>{type.key}</code></td>
+                    <td>{type.label}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div class="shortcode-section">
+            <h4>Environments</h4>
+            <table class="shortcode-table">
+              <thead>
+                <tr>
+                  <th>Key</th>
+                  <th>Label</th>
+                </tr>
+              </thead>
+              <tbody>
+                {environments.map((env) => (
+                  <tr>
+                    <td><code>{env.key}</code></td>
+                    <td>{env.label}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <p class="shortcode-note">
+          Use shortcodes in commit commands: <code>guito c 123 fx "add feature"</code> → <code>f</code> = feat, <code>x</code> = (no environment)
+        </p>
+      </div>
+
+      <!-- Tab 3: Workflows -->
+      <div class="tab-pane" id="workflows">
+        <h3>Common Workflows</h3>
+        {workflows.map((workflow) => (
+          <div class="workflow-block">
+            <h4>{workflow.title}</h4>
+            <pre><code>{workflow.code}</code></pre>
+          </div>
+        ))}
+      </div>
+
+      <!-- Tab 4: Config -->
+      <div class="tab-pane" id="config">
+        <h3>Configuration Examples</h3>
+        {configExamples.map((example) => (
+          <div class="config-example">
+            <h4>{example.title}</h4>
+            <p class="config-desc">{example.desc}</p>
+            <pre><code>{example.code}</code></pre>
+          </div>
+        ))}
+        <p class="config-note">
+          Save as <code>.preguitorc</code> or <code>.preguitorc.json</code> in your project root or <code>~/.config/preguito/config.json</code> globally.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .documentation {
+    background-color: var(--bg-primary);
+    padding: var(--space-8) 0;
+  }
+
+  .docs-intro {
+    text-align: center;
+    max-width: 600px;
+    margin: 0 auto var(--space-6);
+    color: var(--text-secondary);
+    font-size: var(--text-lg);
+  }
+
+  .docs-tabs {
+    display: flex;
+    gap: var(--space-2);
+    justify-content: center;
+    margin-bottom: var(--space-5);
+    flex-wrap: wrap;
+  }
+
+  .tab-button {
+    padding: var(--space-2) var(--space-4);
+    background-color: var(--bg-secondary);
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-md);
+    color: var(--text-secondary);
+    font-weight: 600;
+    font-size: var(--text-base);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+  }
+
+  .tab-button:hover,
+  .tab-button.active {
+    background-color: var(--accent);
+    color: var(--bg-primary);
+    border-color: var(--accent);
+  }
+
+  .docs-content {
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  .tab-pane {
+    display: none;
+  }
+
+  .tab-pane.active {
+    display: block;
+  }
+
+  .tab-pane h3 {
+    text-align: center;
+    margin-bottom: var(--space-5);
+    color: var(--text-primary);
+  }
+
+  .tab-pane h4 {
+    color: var(--accent);
+    margin-bottom: var(--space-2);
+    font-size: var(--text-xl);
+  }
+
+  /* Command Table */
+  .table-wrapper {
+    overflow-x: auto;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+  }
+
+  .command-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: var(--bg-secondary);
+  }
+
+  .command-table th {
+    background-color: var(--accent);
+    color: var(--bg-primary);
+    padding: var(--space-3);
+    text-align: left;
+    font-weight: 600;
+    font-size: var(--text-base);
+  }
+
+  .command-table td {
+    padding: var(--space-2) var(--space-3);
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-primary);
+  }
+
+  .command-table tr:last-child td {
+    border-bottom: none;
+  }
+
+  .command-table code {
+    font-size: var(--text-sm);
+    background-color: var(--bg-primary);
+    padding: 0.25rem 0.5rem;
+    border-radius: var(--radius-sm);
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  /* Shortcodes */
+  .shortcodes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--space-4);
+    margin-bottom: var(--space-4);
+  }
+
+  .shortcode-section h4 {
+    text-align: center;
+    margin-bottom: var(--space-3);
+  }
+
+  .shortcode-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: var(--bg-secondary);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+  }
+
+  .shortcode-table th {
+    background-color: var(--accent);
+    color: var(--bg-primary);
+    padding: var(--space-2);
+    font-weight: 600;
+  }
+
+  .shortcode-table td {
+    padding: var(--space-2);
+    border-bottom: 1px solid var(--border-color);
+    text-align: center;
+  }
+
+  .shortcode-table tr:last-child td {
+    border-bottom: none;
+  }
+
+  .shortcode-table code {
+    background-color: var(--bg-primary);
+    padding: 0.25rem 0.75rem;
+    border-radius: var(--radius-sm);
+    color: var(--accent);
+    font-weight: 700;
+    font-size: var(--text-base);
+  }
+
+  .shortcode-note {
+    text-align: center;
+    color: var(--text-secondary);
+    font-style: italic;
+    margin-top: var(--space-4);
+  }
+
+  .shortcode-note code {
+    background-color: var(--bg-secondary);
+    padding: 0.25rem 0.5rem;
+    border-radius: var(--radius-sm);
+  }
+
+  /* Workflows */
+  .workflow-block {
+    background-color: var(--bg-secondary);
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
+    margin-bottom: var(--space-4);
+    border-left: 4px solid var(--accent);
+  }
+
+  .workflow-block pre {
+    background-color: var(--bg-primary);
+    padding: var(--space-3);
+    border-radius: var(--radius-sm);
+    overflow-x: auto;
+    margin: 0;
+  }
+
+  .workflow-block code {
+    color: var(--text-primary);
+    line-height: 1.8;
+  }
+
+  /* Config Examples */
+  .config-example {
+    background-color: var(--bg-secondary);
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
+    margin-bottom: var(--space-4);
+  }
+
+  .config-desc {
+    color: var(--text-secondary);
+    margin-bottom: var(--space-3);
+    font-style: italic;
+  }
+
+  .config-example pre {
+    background-color: var(--bg-primary);
+    padding: var(--space-3);
+    border-radius: var(--radius-sm);
+    overflow-x: auto;
+    margin: 0;
+  }
+
+  .config-example code {
+    color: var(--text-primary);
+    line-height: 1.6;
+    font-size: var(--text-sm);
+  }
+
+  .config-note {
+    text-align: center;
+    color: var(--text-secondary);
+    margin-top: var(--space-5);
+    padding: var(--space-3);
+    background-color: var(--bg-secondary);
+    border-radius: var(--radius-md);
+  }
+
+  .config-note code {
+    background-color: var(--bg-primary);
+    padding: 0.25rem 0.5rem;
+    border-radius: var(--radius-sm);
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .documentation {
+      padding: var(--space-6) 0;
+    }
+
+    .docs-tabs {
+      flex-direction: column;
+      gap: var(--space-1);
+      max-width: 400px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .tab-button {
+      width: 100%;
+    }
+
+    .command-table {
+      font-size: var(--text-sm);
+    }
+
+    .command-table th,
+    .command-table td {
+      padding: var(--space-1) var(--space-2);
+    }
+
+    .shortcodes-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<script>
+  const tabButtons = document.querySelectorAll('.docs-tabs .tab-button');
+  const tabPanes = document.querySelectorAll('.docs-content .tab-pane');
+
+  tabButtons.forEach((button) => {
+    button.addEventListener('click', () => {
+      const tabName = button.dataset.tab;
+
+      // Remove active from all
+      tabButtons.forEach((btn) => btn.classList.remove('active'));
+      tabPanes.forEach((pane) => pane.classList.remove('active'));
+
+      // Add active to selected
+      button.classList.add('active');
+      document.getElementById(tabName)?.classList.add('active');
+    });
+  });
+</script>
