@@ -1,6 +1,11 @@
 import { execFile, spawn } from "node:child_process";
 import { promisify } from "node:util";
 import { GitOperationError } from "../utils/errors.js";
+import {
+  validateBranchName,
+  validateHash,
+  validateTagName,
+} from "../utils/validation.js";
 
 const execFileAsync = promisify(execFile);
 
@@ -96,6 +101,7 @@ export async function forcePushLease(): Promise<string> {
 }
 
 export async function checkout(branch: string): Promise<void> {
+  validateBranchName(branch);
   await git(["checkout", branch]);
 }
 
@@ -105,11 +111,13 @@ export async function pull(): Promise<string> {
 }
 
 export async function rebase(branch: string): Promise<string> {
+  validateBranchName(branch);
   const result = await git(["rebase", branch]);
   return result.stdout + result.stderr;
 }
 
 export async function rebaseInteractiveEdit(hash: string): Promise<string> {
+  validateHash(hash);
   // Use GIT_SEQUENCE_EDITOR to automatically change "pick <hash>" to "edit <hash>"
   const sedCmd = `sed -i 's/^pick ${hash.slice(0, 7)}/edit ${hash.slice(0, 7)}/'`;
   const result = await git(["rebase", "-i", `${hash}^`], {
@@ -145,12 +153,16 @@ export async function rebaseInteractive(count: number): Promise<void> {
 }
 
 export async function pushUpstream(branch?: string): Promise<string> {
+  if (branch !== undefined) {
+    validateBranchName(branch);
+  }
   const targetBranch = branch ?? (await getCurrentBranch());
   const result = await git(["push", "--set-upstream", "origin", targetBranch]);
   return result.stdout + result.stderr;
 }
 
 export async function commitFixup(hash: string): Promise<string> {
+  validateHash(hash);
   const result = await git(["commit", "--fixup", hash]);
   return result.stdout;
 }
@@ -161,11 +173,16 @@ export async function resetSoft(count: number = 1): Promise<string> {
 }
 
 export async function createBranch(branch: string): Promise<void> {
+  validateBranchName(branch);
   await git(["checkout", "-b", branch]);
 }
 
-export async function stash(): Promise<string> {
-  const result = await git(["stash"]);
+export async function stash(message?: string): Promise<string> {
+  const args = ["stash"];
+  if (message) {
+    args.push("-m", message);
+  }
+  const result = await git(args);
   return result.stdout;
 }
 
@@ -190,11 +207,23 @@ export async function logGrep(
 }
 
 export async function logTag(tag: string): Promise<string> {
+  validateTagName(tag);
   const result = await git(["log", "--oneline", `${tag}..HEAD`]);
   return result.stdout;
 }
 
 export async function logTagAll(tag: string): Promise<string> {
+  validateTagName(tag);
   const result = await git(["log", "--oneline", tag]);
+  return result.stdout;
+}
+
+export async function diff(options: string[] = []): Promise<string> {
+  const result = await git(["diff", ...options]);
+  return result.stdout;
+}
+
+export async function stashList(): Promise<string> {
+  const result = await git(["stash", "list"]);
   return result.stdout;
 }

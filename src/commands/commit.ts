@@ -4,6 +4,7 @@ import { renderTemplate } from "../template/engine.js";
 import { parsePositionalArgs } from "./commit-parser.js";
 import * as gitOps from "../git/operations.js";
 import { PrequitoError } from "../utils/errors.js";
+import { requireGitRepo, withErrorHandling } from "../utils/command.js";
 import { spinner } from "../utils/spinner.js";
 
 export function registerCommitCommand(program: Command): void {
@@ -16,28 +17,26 @@ export function registerCommitCommand(program: Command): void {
     .option("-f, --force", "Push with --force-with-lease after committing")
     .option("-d, --dry-run", "Show the generated message without executing")
     .option("-S, --no-stage", "Skip auto-staging (git add -A)")
-    .option("-b, --body <text>", "Commit body (optional, multi-line description)")
-    .action(async (args: string[], opts: Record<string, unknown>) => {
-      try {
+    .action(
+      withErrorHandling(async (args: string[], opts: CommitOptions) => {
         await executeCommit(args, opts);
-      } catch (error) {
-        if (error instanceof PrequitoError) {
-          console.error(`\u2716 ${error.message}`);
-          process.exit(1);
-        }
-        throw error;
-      }
-    });
+      })
+    );
+}
+
+interface CommitOptions {
+  push?: boolean;
+  force?: boolean;
+  dryRun?: boolean;
+  stage?: boolean;
+  body?: string;
 }
 
 export async function executeCommit(
   args: string[],
-  opts: Record<string, unknown>
+  opts: CommitOptions
 ): Promise<void> {
-  if (!(await gitOps.isGitRepo())) {
-    console.error("\u2716 Not inside a git repository.");
-    process.exit(1);
-  }
+  await requireGitRepo();
 
   const config = await loadConfigOrDefault();
   const bodyText = typeof opts.body === "string" ? opts.body : undefined;
@@ -57,8 +56,7 @@ export async function executeCommit(
   }
 
   if (!(await gitOps.hasStagedChanges())) {
-    console.error("\u2716 No staged changes to commit.");
-    process.exit(1);
+    throw new PrequitoError("No staged changes to commit.");
   }
 
   // Show only title in spinner (body may be long)
