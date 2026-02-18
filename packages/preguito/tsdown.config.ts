@@ -9,6 +9,7 @@ export default defineConfig([
     entry: { "cli-sea": "src/cli.ts" },
     format: "cjs",
     noExternal: [/.*/],
+    inlineOnly: false,
   },
   {
     entry: ["src/index.ts"],
