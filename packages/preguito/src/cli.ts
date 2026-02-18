@@ -21,7 +21,7 @@ const program = new Command();
 program
   .name("guito")
   .description("preguito - a lazy git CLI with commit templates and shortcuts")
-  .version("0.1.0")
+  .version("0.2.1")
   .addHelpText(
     "before",
     "\n🦥 preguito v0.1.0\n   A lazy git CLI with commit templates and shortcuts.\n"
