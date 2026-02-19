@@ -27,6 +27,7 @@ Typing the same commit prefix, squad name, and ticket number over and over is te
 - [Configuration](#%EF%B8%8F-configuration)
 - [Programmatic API](#-programmatic-api)
 - [FAQ](#-faq)
+- [Claude Code Integration](#-claude-code-integration)
 - [Contributing](#-contributing)
 - [License](#-license)
 
@@ -470,6 +471,22 @@ Project-local config (`.preguitorc` in repo root) takes priority over global con
 
 **Can I customize the shortcode letters?**
 Yes. During `guito i` setup, you can reassign any letter to any type or environment. Run `guito i` again to reconfigure.
+
+---
+
+## 🤖 Claude Code Integration
+
+preguito has an official [Claude Code skill](https://github.com/jacodoisdois/preguito-skill) that teaches Claude the full `guito` command syntax, template system, and shortcodes.
+
+```bash
+npx skills add jacodoisdois/preguito-skill -g
+```
+
+Once installed, Claude Code will:
+
+- Automatically use `guito c` instead of `git commit` in preguito projects
+- Read your `.preguitorc` config to determine the correct shortcodes and card ID format
+- Offer a `/guito-commit` slash command for interactive commit crafting with dry-run preview
 
 ---
 
