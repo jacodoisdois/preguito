@@ -14,7 +14,7 @@
         <button class="tab-button active" data-tab="npm">npm</button>
         <button class="tab-button" data-tab="deb">deb</button>
         <button class="tab-button" data-tab="binary">Binary</button>
-        <button class="tab-button" data-tab="claude">Claude Code</button>
+        <button class="tab-button" data-tab="claude">Agent Skill</button>
       </div>
 
       <div class="tab-content">
@@ -49,12 +49,12 @@ sudo mv guito /usr/local/bin/</code></pre>
         </div>
 
         <div class="tab-pane" id="claude">
-          <p class="tab-description">For Claude Code users</p>
+          <p class="tab-description">For AI agent users</p>
           <div class="code-block">
             <pre><code>npx skills add jacodoisdois/preguito-skill -g</code></pre>
             <button class="copy-btn" data-copy="npx skills add jacodoisdois/preguito-skill -g">Copy</button>
           </div>
-          <p class="tab-note">Teaches Claude your .preguitorc config, shortcodes and enables <code>/guito-commit</code></p>
+          <p class="tab-note">Teaches your AI agent the .preguitorc config, shortcodes and enables <code>/guito-commit</code></p>
           <a href="https://github.com/jacodoisdois/preguito-skill" target="_blank" rel="noopener noreferrer" class="btn btn-secondary mt-3">
             View skill on GitHub →
           </a>
@@ -121,6 +121,7 @@ sudo mv guito /usr/local/bin/</code></pre>
 
   .tab-note {
     text-align: center;
+    text-wrap: balance;
     color: var(--text-secondary);
     font-size: var(--text-sm);
     margin-top: var(--space-3);
@@ -180,7 +181,7 @@ sudo mv guito /usr/local/bin/</code></pre>
 
   tabButtons.forEach((button) => {
     button.addEventListener('click', () => {
-      const tabName = button.dataset.tab;
+      const tabName = (button as HTMLElement).dataset.tab;
 
       // Remove active from all
       tabButtons.forEach((btn) => btn.classList.remove('active'));
@@ -188,7 +189,7 @@ sudo mv guito /usr/local/bin/</code></pre>
 
       // Add active to selected
       button.classList.add('active');
-      document.getElementById(tabName).classList.add('active');
+      document.getElementById(tabName!)?.classList.add('active');
     });
   });
 
@@ -197,7 +198,7 @@ sudo mv guito /usr/local/bin/</code></pre>
 
   copyButtons.forEach((button) => {
     button.addEventListener('click', async () => {
-      const text = button.dataset.copy;
+      const text = (button as HTMLElement).dataset.copy ?? '';
 
       try {
         await navigator.clipboard.writeText(text);
